@@ -18,6 +18,7 @@
   "homepage": "https://github.com/beyond-Devs/batch_management#readme",
   "dependencies": {
     "@prisma/client": "^5.20.0",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "prisma": "^5.20.0",
     "zod": "^3.23.8"

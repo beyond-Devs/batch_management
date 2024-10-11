@@ -1,5 +1,8 @@
 const express = require('express');
+const cors = require('cors'); 
+const { z } = require('zod');
 const { PrismaClient } = require('@prisma/client');
+const loginSchema = require('./schemas/loginSchema')
 const userSchema = require('./schemas/userSchema');
 const condominiumSchema = require('./schemas/condominiumSchema');
 const lotSchema = require('./schemas/lotSchema');
@@ -9,7 +12,34 @@ const occupancySchema = require('./schemas/occupancySchema');
 const app = express();
 const prisma = new PrismaClient();
 
+// Configurando o CORS
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  credentials: true, 
+}));
+
 app.use(express.json());
+
+// Endpoint para login
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  // Validação dos campos
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
+  }
+
+  // Lógica de autenticação
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user || user.password !== password) {
+    return res.status(400).json({ message: 'Credenciais inválidas.' });
+  }
+
+  res.json({ message: 'Login bem-sucedido.' });
+});
+
 
 // Endpoint para criar um usuário
 app.post('/users', async (req, res) => {
