@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Criação do backend da aplicação para gestão de lotes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beyond-Devs/batch_management.git"
+  },
+  "author": "Bernardo Da Silva Morais",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beyond-Devs/batch_management/issues"
+  },
+  "homepage": "https://github.com/beyond-Devs/batch_management#readme",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
