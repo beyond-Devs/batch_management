@@ -105,7 +105,7 @@ export function useLogin() {
 
     const [message, setMessage] = useState<Message | null>(null);
 
-    function showToast(message: Message, type) {
+    function showToast(message: Message) {
         toast({
             variant: message.type === 'error' ? 'destructive' : 'default',
             title: message.type === 'error' ? 'Erro' : 'Sucesso',
