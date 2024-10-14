@@ -48,7 +48,7 @@ const Page = () => {
                     <p className="text-gray-600 mb-8">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
                         magna aliqua.{" "}
-                        <Link href="/login" className="text-blue-500 hover:underline">
+                        <Link href="/" className="text-blue-500 hover:underline">
                             Já tem uma conta? Faça login.
                         </Link>
                     </p>

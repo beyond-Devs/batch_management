@@ -5,8 +5,7 @@ export const publicRoutes = [
 
 
 export const protectedRoutes = [
-    "/welcome",
-    "/signup"
+    "/welcome"
 ]
 
 
