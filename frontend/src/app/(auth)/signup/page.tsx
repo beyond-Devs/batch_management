@@ -24,13 +24,18 @@ const Page = () => {
 
     const onSubmit = async (data: SCH_signup_Props) => {
         const result = await signup(data);
+        
         if (result) {
-            toast({ title: "Cadastro realizado com sucesso!", variant: "success", description: "Você pode fazer login agora." });
+            toast({ title: "", variant: "default", description: result });
         } else {
-            // toast({ title: "Erro", variant: "destructive", description: error || "Não foi possível cadastrar." });
-            toast({ title: "Erro", variant: "destructive", description: error || "Não foi possível cadastrar." });
+            // Aqui, verificamos se o erro é do tipo 'error' ou não
+            const errorMessage = error?.includes("Erro de validação") 
+                ? "Erro de validação. Verifique os campos e tente novamente."
+                : error || "Não foi possível cadastrar.";
+            
+            toast({ title: "Erro", variant: "destructive", description: errorMessage });
         }
-    };
+    };    
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">

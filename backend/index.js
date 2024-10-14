@@ -53,7 +53,7 @@ app.post('/users', async (req, res) => {
       console.log(error.errors); // Logando erros de validação
       return res.status(400).json({ message: "Erro ao validar dados, verifique seus dados!", errors: error.errors.map.ZodError.message });
     }
-    res.status(500).json({ message: "Impossível cadastrar, ou o email inserido já está cadastrado no sistema" });
+    res.status(500).json({ message: "Impossível cadastrar usuário, ou o email inserido já está cadastrado no sistema" });
   }
 });
 

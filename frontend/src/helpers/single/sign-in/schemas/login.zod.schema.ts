@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const SCH_login = z.object({
     email: z.string().email("Formato de email invalido"),
-    password: z.string().min(5, "Senha muito curta"),
+    password: z.string().optional(),
 });
 
 

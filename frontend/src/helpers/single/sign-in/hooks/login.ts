@@ -143,17 +143,6 @@ export function useLogin() {
             }
         }).catch((error) => {
             let errorMessage = error.response.data.message;
-            // console.log(error.response)
-            // if (error.code === "ERR_NETWORK" || error.request.status === 0) {
-            //     setMessage({ message: errorMessage, type: "error" });
-            // } else if (error.response?.data?.status === 401) {
-            //     errorMessage = error?.response?.data?.message || errorMessage;
-            //     setMessage({ message: errorMessage, type: "error" });
-            // } else if (error.response?.data?.status === 500) {
-            //     errorMessage = "Alguma coisa aconteceu de forma inesperada, tente novamente";
-            //     setMessage({ message: errorMessage, type: "error" });
-            // }
-
             showToast({ message: errorMessage, type: "error" });
         }).finally(() => {
             setIsPadding(false);

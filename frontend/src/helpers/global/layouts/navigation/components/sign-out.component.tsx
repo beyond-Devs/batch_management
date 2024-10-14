@@ -13,10 +13,9 @@ const SignOutDialog = () => {
 
     return (
         <DialogHeader>
-            <DialogTitle>Tem certeza que deseja sair?</DialogTitle>
+            <DialogTitle>Terminar sessão</DialogTitle>
             <DialogDescription>
-                Esta ação não pode ser desfeita. Isto removerá permanentemente sua conta
-                e excluirá seus dados de nossos servidores.
+                Terá que fazer login para voltar a usar os nossos serviços, Deseja continar?
             </DialogDescription>
             <br />
             <DialogFooter className='flex justify-right gap-1'>
@@ -24,7 +23,7 @@ const SignOutDialog = () => {
                     <Button variant='ghost' className='bg'>Cancelar</Button>
                 </DialogClose>
 
-                <Button variant='destructive' onClick={handleSignOut} className='rounded-full'>Sair</Button>
+                <Button variant='destructive' onClick={handleSignOut} className='rounded-full'>Terminar sessão</Button>
             </DialogFooter>
         </DialogHeader>
     );
