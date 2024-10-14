@@ -1,0 +1,18 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off", // Disable explicit 'any' types
+    "@typescript-eslint/no-empty-interface": "off", // Disable warning for empty interfaces
+    "@typescript-eslint/no-empty-object-type": "off", // Disable warning for empty object types
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // Change to "error" if you want it to be an error instead of a warning
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_", // Ignore unused function arguments starting with _
+        "varsIgnorePattern": "^(?!_).*" // Allow unused vars that are not prefixed with an underscore
+      }
+    ]
+  }
+}

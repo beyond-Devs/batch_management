@@ -1,0 +1,41 @@
+image: node:20.17.0
+
+stages:
+  - install
+  - test
+  - build
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+install_dependencies:
+  stage: install
+  script:
+    - npm install
+
+test:
+  stage: test
+  script:
+    - npm run lint
+    - npm run test
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - .next
+
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Deploying to production server"
+    - npm run export 
+  environment:
+    name: production
+    url: https://sysconp-cicd.com
+  only:
+    - main
