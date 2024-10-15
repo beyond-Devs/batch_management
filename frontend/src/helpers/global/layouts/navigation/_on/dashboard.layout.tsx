@@ -136,7 +136,6 @@ import { Bell, Sun, Moon, LogOutIcon, Menu, Settings } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import SignOutDialog from "@/helpers/global/layouts/navigation/components/sign-out.component"
 import { useTheme } from "next-themes"
-import { useSession } from "next-auth/react"
 
 const lotStatusData = [
   { name: "Ocupado", value: 300, color: "#4CAF50" },
@@ -154,7 +153,6 @@ const recentOccupations = [
 
 const Dashboard = ({ children }) => {
   const { setTheme, theme } = useTheme();
-  const { data: session } = useSession();
 
   const [activeMenu, setActiveMenu] = useState("Início");
   const [ownerFilter, setOwnerFilter] = useState("Todos");
@@ -229,7 +227,7 @@ const Dashboard = ({ children }) => {
               <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="mr-4">
                 <Menu className="h-5 w-5 text-gray-700 dark:text-gray-200" />
               </Button>
-              <Input className="w-64 mr-4 dark:border-gray-600" placeholder="Pesquisar..." />
+              <Input className="w-64 mr-4 dark:border-gray-600 rounded-full" placeholder="Pesquisar..." />
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon">
