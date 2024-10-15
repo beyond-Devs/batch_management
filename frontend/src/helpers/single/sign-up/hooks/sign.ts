@@ -112,7 +112,7 @@ const useSignup = () => {
             });
 
             if (sign?.ok) {
-                window.location.assign("/?welcome=" + String(response.data?.user?.name));
+                window.location.assign("/?dashboard=" + String(response.data?.user?.name));
             }
 
             return response.data;

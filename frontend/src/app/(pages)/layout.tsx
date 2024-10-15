@@ -14,7 +14,9 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
         <NextTopLoader color="#1F4FA2" initialPosition={0.08} crawlSpeed={500} height={3} crawl={true} showSpinner={true} easing="ease" speed={400} />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <SessionProvider>
-            {children}
+            <Layouts.Dashboard>
+              {children}
+            </Layouts.Dashboard>
            </SessionProvider>
         </ThemeProvider>
       </body>

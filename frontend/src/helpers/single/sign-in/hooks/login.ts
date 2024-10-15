@@ -134,7 +134,7 @@ export function useLogin() {
                 });
 
                 if (sign?.ok) {
-                    window.location.assign("/?welcome=" + String(res.data?.user?.name));
+                    window.location.assign("/?dashboard=" + String(res.data?.user?.name));
                 }
             } catch (error) {
                 const errorMessage = "Alguma coisa aconteceu de forma inesperada, tente novamente";

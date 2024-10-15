@@ -5,7 +5,7 @@ export const publicRoutes = [
 
 
 export const protectedRoutes = [
-    "/welcome"
+    "/dashboard"
 ]
 
 
@@ -17,4 +17,4 @@ export const authRoutes = [
 export const apiAuthPrefix = "/lib/auth"
 
 
-export const DEFAULT_LOGIN_REDIRECT = "/welcome"
+export const DEFAULT_LOGIN_REDIRECT = "/dashboard"

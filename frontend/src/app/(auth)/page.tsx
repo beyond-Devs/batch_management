@@ -266,7 +266,7 @@ const Page = () => {
       <div className="flex-1 flex items-center justify-center p-10 bg-white">
         <div className="w-full max-w-md space-y-8">
           {/* Boas-vindas e descrição */}
-          <div className="text-justify">
+          <div className="">
             <img
               alt="User avatar"
               className="w-16 h-16 object-cover"
@@ -277,7 +277,8 @@ const Page = () => {
               }}
             />
             <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Bem-vindo a Pedromag 👋
+              {/* Bem-vindo a Pedromag 👋 */}
+              Gestão de condominios
             </h2>
             <p className="mt-2 text-sm text-gray-600">
               Inicie sessão para poder usar e beneficiar-se do nosso sistema!
