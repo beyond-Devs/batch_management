@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors'); 
 const { z } = require('zod');
 const { PrismaClient } = require('@prisma/client');
-const loginSchema = require('./schemas/loginSchema')
+const loginSchema = require('./schemas/loginSchema');
 const userSchema = require('./schemas/userSchema');
 const condominiumSchema = require('./schemas/condominiumSchema');
+const streetSchema = require('./schemas/streetSchema'); 
 const lotSchema = require('./schemas/lotSchema');
 const ownerSchema = require('./schemas/ownerSchema');
 const occupancySchema = require('./schemas/occupancySchema');
@@ -31,18 +32,15 @@ app.post('/login', async (req, res) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || user.password !== password) {
-      return res.status(401).json({ message: 'Credenciais inválidas.' });
+      return res.status(401).json({ message: 'Email ou senha incorrectos' });
   }
 
-  // Retornar o usuário ao invés de uma mensagem
   res.json({ user });
 });
-
 
 // Endpoint para criar um usuário
 app.post('/users', async (req, res) => {
   try {
-    console.log(req.body); // Logando os dados recebidos
     const parsedData = userSchema.parse(req.body);
     const user = await prisma.user.create({
       data: parsedData,
@@ -50,8 +48,7 @@ app.post('/users', async (req, res) => {
     res.json(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.log(error.errors); // Logando erros de validação
-      return res.status(400).json({ message: "Erro ao validar dados, verifique seus dados!", errors: error.errors.map.ZodError.message });
+      return res.status(400).json({ message: "Erro ao validar dados, verifique seus dados!", errors: error.errors });
     }
     res.status(500).json({ message: "Impossível cadastrar usuário, ou o email inserido já está cadastrado no sistema" });
   }
@@ -81,8 +78,36 @@ app.post('/condominiums', async (req, res) => {
 
 // Endpoint para listar todos os condomínios
 app.get('/condominiums', async (req, res) => {
-  const condominiums = await prisma.condominium.findMany();
+  const condominiums = await prisma.condominium.findMany({
+    include: { streets: true } // Incluir ruas associadas ao condomínio
+  });
   res.json(condominiums);
+});
+
+// Endpoint para criar uma rua (street)
+app.post('/streets', async (req, res) => {
+  try {
+    const parsedData = streetSchema.parse(req.body);
+
+    const street = await prisma.street.create({
+      data: parsedData,
+    });
+
+    res.json(street);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: "Erro ao validar os dados", errors: error.errors });
+    }
+    res.status(500).json({ message: "Impossível adicionar rua ao condomínio" });
+  }
+});
+
+// Endpoint para listar todas as ruas
+app.get('/streets', async (req, res) => {
+  const streets = await prisma.street.findMany({
+    include: { lots: true } // Incluir lotes associados à rua
+  });
+  res.json(streets);
 });
 
 // Endpoint para criar um lote
@@ -103,7 +128,9 @@ app.post('/lots', async (req, res) => {
 
 // Endpoint para listar todos os lotes
 app.get('/lots', async (req, res) => {
-  const lots = await prisma.lot.findMany();
+  const lots = await prisma.lot.findMany({
+    include: { street: true } // Incluir a rua associada ao lote
+  });
   res.json(lots);
 });
 
@@ -149,7 +176,7 @@ app.post('/occupancies', async (req, res) => {
 app.get('/occupancies', async (req, res) => {
   const occupancies = await prisma.occupancy.findMany({
     include: {
-      lot: true,
+      lot: { include: { street: true } }, // Incluir lotes e ruas
       owner: true,
       user: true,
     },

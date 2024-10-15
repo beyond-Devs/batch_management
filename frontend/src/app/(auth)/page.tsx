@@ -228,7 +228,7 @@ const Page = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
       {/* Esquerda com ícones e imagem */}
-      <div className="flex-1 flex items-center justify-center p-10">
+      <div className="flex-1 flex items-center justify-center p-8 righ-waves" >
         <div className="relative w-full max-w-md">
           {/* Bolhas de fundo animadas */}
           <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
@@ -339,12 +339,35 @@ const Page = () => {
 
             {/* Botão de Login */}
             <div>
-              <Button
+            <Button
                 type="submit"
                 disabled={isPadding}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                {isPadding ? "Carregando..." : "Iniciar sessão"}
+                {isPadding ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8h8a8 8 0 11-16 0z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Iniciar sessão"
+                )}
               </Button>
             </div>
           </form>

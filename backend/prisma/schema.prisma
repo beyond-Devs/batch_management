@@ -1,3 +1,71 @@
+// datasource db {
+//   provider = "mysql"
+//   url      = "mysql://root@localhost:3306/glote_db"
+// }
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// enum UserRole {
+//   admin
+//   user
+// }
+
+// enum LotStatus {
+//   Available
+//   Occupied
+//   Construction
+//   Delivered
+// }
+
+// model User {
+//   id         Int       @id @default(autoincrement())
+//   full_name  String
+//   email      String    @unique
+//   password   String
+//   role       UserRole  @default(user)
+//   created_at DateTime  @default(now())
+//   occupancies Occupancy[] @relation("UserOccupancies") 
+// }
+
+// model Condominium {
+//   id         Int       @id @default(autoincrement())
+//   name       String
+//   location   String?
+//   created_at DateTime  @default(now())
+//   lots       Lot[]     
+// }
+
+// model Lot {
+//   id             Int       @id @default(autoincrement())
+//   lot_number     Int
+//   condominium_id Int?
+//   status         LotStatus @default(Available)
+//   description    String?
+//   condominium    Condominium? @relation(fields: [condominium_id], references: [id])
+//   occupancies    Occupancy[] 
+// }
+
+// model Owner {
+//   id        Int      @id @default(autoincrement())
+//   full_name String
+//   contact   String?
+//   email     String?
+//   occupancies Occupancy[] 
+// }
+
+// model Occupancy {
+//   id             Int      @id @default(autoincrement())
+//   lot_id        Int?
+//   owner_id      Int?
+//   occupancy_date DateTime?
+//   lot           Lot?     @relation(fields: [lot_id], references: [id], onDelete: Cascade)
+//   owner         Owner?   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+//   userId        Int?     
+//   user          User?    @relation("UserOccupancies", fields: [userId], references: [id]) 
+// }
+
 datasource db {
   provider = "mysql"
   url      = "mysql://root@localhost:3306/glote_db"
@@ -20,48 +88,56 @@ enum LotStatus {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  full_name  String
-  email      String    @unique
-  password   String
-  role       UserRole  @default(user)
-  created_at DateTime  @default(now())
+  id          Int         @id @default(autoincrement())
+  full_name   String
+  email       String      @unique
+  password    String
+  role        UserRole    @default(user)
+  created_at  DateTime    @default(now())
   occupancies Occupancy[] @relation("UserOccupancies") 
 }
 
 model Condominium {
-  id         Int       @id @default(autoincrement())
-  name       String
-  location   String?
-  created_at DateTime  @default(now())
-  lots       Lot[]     
+  id          Int       @id @default(autoincrement())
+  name        String
+  location    String?
+  created_at  DateTime  @default(now())
+  streets     Street[]  // Um condomínio pode ter várias ruas
+}
+
+model Street {
+  id            Int         @id @default(autoincrement())
+  name          String
+  condominium_id Int        // Relacionamento com o condomínio
+  condominium   Condominium @relation(fields: [condominium_id], references: [id])
+  lots          Lot[]       // Uma rua pode ter vários lotes
 }
 
 model Lot {
-  id             Int       @id @default(autoincrement())
-  lot_number     Int
-  condominium_id Int?
-  status         LotStatus @default(Available)
-  description    String?
-  condominium    Condominium? @relation(fields: [condominium_id], references: [id])
-  occupancies    Occupancy[] 
+  id            Int        @id @default(autoincrement())
+  lot_number    Int
+  street_id     Int?       // Relacionamento com a rua
+  status        LotStatus  @default(Available)
+  description   String?
+  street        Street?    @relation(fields: [street_id], references: [id])
+  occupancies   Occupancy[]
 }
 
 model Owner {
-  id        Int      @id @default(autoincrement())
-  full_name String
-  contact   String?
-  email     String?
+  id          Int      @id @default(autoincrement())
+  full_name   String
+  contact     String?
+  email       String?
   occupancies Occupancy[] 
 }
 
 model Occupancy {
   id             Int      @id @default(autoincrement())
-  lot_id        Int?
-  owner_id      Int?
+  lot_id         Int?
+  owner_id       Int?
   occupancy_date DateTime?
-  lot           Lot?     @relation(fields: [lot_id], references: [id], onDelete: Cascade)
-  owner         Owner?   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
-  userId        Int?     
-  user          User?    @relation("UserOccupancies", fields: [userId], references: [id]) 
+  lot            Lot?     @relation(fields: [lot_id], references: [id], onDelete: Cascade)
+  owner          Owner?   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  userId         Int?     
+  user           User?    @relation("UserOccupancies", fields: [userId], references: [id]) 
 }
