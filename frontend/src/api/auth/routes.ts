@@ -5,7 +5,10 @@ export const publicRoutes = [
 
 
 export const protectedRoutes = [
-    "/dashboard"
+    "/dashboard",
+    "/condominium",
+    "/condominium/create",
+    "/street"
 ]
 
 

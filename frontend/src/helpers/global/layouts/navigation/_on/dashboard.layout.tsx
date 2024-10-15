@@ -136,6 +136,8 @@ import { Bell, Sun, Moon, LogOutIcon, Menu, Settings } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import SignOutDialog from "@/helpers/global/layouts/navigation/components/sign-out.component"
 import { useTheme } from "next-themes"
+import NavProfile from "../components/nav-profile.component";
+import { useSession } from "next-auth/react";
 
 const lotStatusData = [
   { name: "Ocupado", value: 300, color: "#4CAF50" },
@@ -159,6 +161,7 @@ const Dashboard = ({ children }) => {
   const [darkMode, setDarkMode] = useState(theme === "dark");
   const [chartFilter, setChartFilter] = useState("Todos");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { data: session } = useSession(); 
 
   useEffect(() => {
     setTheme(darkMode ? "dark" : "light");
@@ -178,7 +181,7 @@ const Dashboard = ({ children }) => {
       {sidebarOpen && (
         <aside className="w-64 bg-white dark:bg-gray-800">
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Pedromag</h2>
+            <h2 className="text-2xl font-bold text-blue-800 dark:text-indigo-400">Pedromag</h2>
           </div>
           <ScrollArea className="h-[calc(100vh-180px)]">
             <nav className="mt-6 px-4">
@@ -189,7 +192,7 @@ const Dashboard = ({ children }) => {
                     className={`w-full justify-start mb-1 ${activeMenu === item.name ? "bg-indigo-50 dark:bg-indigo-900" : ""} hover:bg-indigo-50 dark:hover:bg-indigo-900`}
                     onClick={() => setActiveMenu(item.name)}
                   >
-                    <item.icon className="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                    <item.icon className="mr-2 h-4 w-4 text-blue-800 dark:text-indigo-400" />
                     <span className="text-gray-700 dark:text-gray-200">{item.name}</span>
                   </Button>
 
@@ -203,12 +206,12 @@ const Dashboard = ({ children }) => {
               className="w-full justify-start mb-1 hover:bg-indigo-50 dark:hover:bg-indigo-900"
               onClick={() => setActiveMenu("Configurações")}
             >
-              <Settings className="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+              <Settings className="mr-2 h-4 w-4 text-blue-800 dark:text-indigo-400" />
               <span className="text-gray-700 dark:text-gray-200">Configurações</span>
             </Button>
             <Dialog>
               <DialogTrigger className="flex gap-1 py-1 items-center cursor-pointer px-4 text-sm w-full rounded-sm hover:bg-indigo-50 dark:hover:bg-indigo-900">
-                <LogOutIcon className="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                <LogOutIcon className="mr-2 h-4 w-4 text-blue-800 dark:text-indigo-400" />
                 <div className="text-gray-700 dark:text-gray-200">Sair</div>
               </DialogTrigger>
               <DialogContent className="bg-white">
@@ -236,33 +239,9 @@ const Dashboard = ({ children }) => {
               <div className="flex items-center space-x-2">
                 <Sun className="h-4 w-4 text-yellow-500" />
                 <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-                <Moon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                <Moon className="h-4 w-4 text-blue-800 dark:text-indigo-400" />
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 rounded-full flex items-center space-x-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-indigo-600 text-white">JS</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">João Silva</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">João Silva</p>
-                      <p className="text-xs leading-none text-muted-foreground">joao.silva@example.com</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Configurações
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <NavProfile session={session}/>
             </div>
           </div>
         </header>
