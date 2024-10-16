@@ -66,7 +66,7 @@ const Page = () => {
 
   return (
     <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
-      <h1 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Painel de Controle</h1>
+      {/* <h1 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Painel de Controle</h1> */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white border-none">
           <CardHeader className="flex flex-row items-center justify-between pb-2">

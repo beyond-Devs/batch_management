@@ -26,16 +26,16 @@ app.use(cors({
 app.use(express.json());
 
 // Middleware para verificar o token
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Token não fornecido' });
+// const authenticateToken = (req, res, next) => {
+//   const token = req.headers['authorization']?.split(' ')[1];
+//   if (!token) return res.status(401).json({ message: 'Token não fornecido' });
 
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Token inválido' });
-    req.user = user;
-    next();
-  });
-};
+//   jwt.verify(token, SECRET_KEY, (err, user) => {
+//     if (err) return res.status(403).json({ message: 'Token inválido' });
+//     req.user = user;
+//     next();
+//   });
+// };
 
 // Endpoint para login
 app.post('/login', async (req, res) => {
@@ -52,8 +52,9 @@ app.post('/login', async (req, res) => {
   }
 
   // Gerar o token JWT
-  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-  res.json({ token });
+  // const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+  // res.json({ token });
+  res.json({ user });
 });
 
 // Endpoint para criar um usuário
@@ -78,7 +79,7 @@ app.post('/users', async (req, res) => {
 });
 
 // A partir daqui, todas as rotas serão protegidas pelo token
-app.use(authenticateToken);
+// app.use(authenticateToken);
 
 // Endpoint para listar todos os usuários
 app.get('/users', async (req, res) => {
