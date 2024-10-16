@@ -20,7 +20,7 @@ import { Label } from '@radix-ui/react-label';
 interface ManageCondominiumDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  condominiumId: number; // ID do condomínio a ser gerenciado
+  condominiumId: number;
 }
 
 const ManageCondominiumDialog: React.FC<ManageCondominiumDialogProps> = ({ isOpen, onClose, condominiumId }) => {
@@ -35,7 +35,7 @@ const ManageCondominiumDialog: React.FC<ManageCondominiumDialogProps> = ({ isOpe
         condominium_id: condominiumId,
       });
       console.log('Rua adicionada:', response.data);
-      setStreetName(''); // Limpa o campo após a adição
+      setStreetName(''); 
     } catch (error) {
       console.error('Erro ao adicionar a rua:', error);
     }
@@ -45,11 +45,11 @@ const ManageCondominiumDialog: React.FC<ManageCondominiumDialogProps> = ({ isOpe
     try {
       const response = await axios.post('/lots', {
         name: lotName,
-        lot_number: parseInt(lotNumber), // Converte o número do lote para inteiro
-        street_id: /* ID da rua onde o lote será adicionado */, // Adicione a lógica para obter o ID da rua
+        lot_number: parseInt(lotNumber),
+        street_id: 
       });
       console.log('Lote adicionado:', response.data);
-      setLotName(''); // Limpa o campo após a adição
+      setLotName(''); 
       setLotNumber('');
     } catch (error) {
       console.error('Erro ao adicionar o lote:', error);
@@ -61,7 +61,7 @@ const ManageCondominiumDialog: React.FC<ManageCondominiumDialogProps> = ({ isOpe
       <DialogTrigger asChild>
         <Button variant="outline">Gerir Condomínio</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] overflow-y-scroll">
+      <DialogContent className="sm:max-w-[425px] overflow-y-scroll bg-white">
         <DialogHeader>
           <DialogTitle>Gerir Condomínio {condominiumId}</DialogTitle>
         </DialogHeader>
