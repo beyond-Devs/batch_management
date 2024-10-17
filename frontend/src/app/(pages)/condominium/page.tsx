@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from "react";
 import createAxiosInstance from "@/helpers/global/services/axios/axios.instance";
-import { Edit2, Trash2, MoreHorizontal, Plus, FileBarChart, FileBarChart2 } from "lucide-react";
+import { Edit2, Trash2, MoreHorizontal, Plus, FileBarChart2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import ManageCondominiumDialog from "./manage/page";
 
 const CondominiumsList = () => {
     const [condominiums, setCondominiums] = useState([]);
@@ -75,14 +74,6 @@ const CondominiumsList = () => {
         }
     };
 
-    const [isDialogManageOpen, setDialogManageOpen] = useState(false);
-  const [condominiumId, setCondominiumId] = useState<number>(1); // Definindo o estado para o ID do condomínio
-
-  const handleOpenDialogManage = (id: number) => {
-    setCondominiumId(id); // Atualiza o ID do condomínio
-    setDialogManageOpen(true); // Abre o diálogo
-  };
-
     return (
         <div className="w-11/12 mx-auto my-5 relative h-auto">
             <div className="grid grid-cols-2 mb-4">
@@ -132,9 +123,11 @@ const CondominiumsList = () => {
                                         </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={() => handleOpenDialogManage(condominium.id)}>
-                                            <FileBarChart2 className="mr-2 w-4 h-4" />Gerir condominio
-                                        </DropdownMenuItem>
+                                        <Link href={`/condominium/manage?id=${condominium.id}`} >
+                                            <DropdownMenuItem>
+                                                <FileBarChart2 className="mr-2 w-4 h-4" />Gerir condomínio
+                                            </DropdownMenuItem>
+                                        </Link>
                                         <DropdownMenuItem onClick={() => handleEdit(condominium)}>
                                             <Edit2 className="mr-2 w-4 h-4" /> Editar
                                         </DropdownMenuItem>
@@ -210,19 +203,13 @@ const CondominiumsList = () => {
                         </div>
                         <div className="mt-4 flex justify-end space-x-2">
                             <DialogClose asChild>
-                                <Button type="button" className="dark:text-black">Cancelar</Button>
+                                <Button variant="outline">Cancelar</Button>
                             </DialogClose>
-                            <Button type="submit" className="dark:text-white dark:bg-black">Salvar</Button>
+                            <Button type="submit">Salvar</Button>
                         </div>
                     </form>
                 </DialogContent>
             </Dialog>
-
-            <ManageCondominiumDialog
-                isOpen={isDialogManageOpen}
-                onClose={() => setDialogManageOpen(false)}
-                condominiumId={condominiumId}
-            />
         </div>
     );
 };

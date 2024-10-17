@@ -22,10 +22,21 @@ CREATE TABLE `Condominium` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Street` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `condominiumId` INTEGER NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Lot` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `lot_number` INTEGER NOT NULL,
-    `condominium_id` INTEGER NULL,
+    `street_id` INTEGER NULL,
     `status` ENUM('Available', 'Occupied', 'Construction', 'Delivered') NOT NULL DEFAULT 'Available',
     `description` VARCHAR(191) NULL,
 
@@ -54,7 +65,10 @@ CREATE TABLE `Occupancy` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Lot` ADD CONSTRAINT `Lot_condominium_id_fkey` FOREIGN KEY (`condominium_id`) REFERENCES `Condominium`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Street` ADD CONSTRAINT `Street_condominiumId_fkey` FOREIGN KEY (`condominiumId`) REFERENCES `Condominium`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Lot` ADD CONSTRAINT `Lot_street_id_fkey` FOREIGN KEY (`street_id`) REFERENCES `Street`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Occupancy` ADD CONSTRAINT `Occupancy_lot_id_fkey` FOREIGN KEY (`lot_id`) REFERENCES `Lot`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

@@ -106,12 +106,15 @@ model Condominium {
 }
 
 model Street {
-  id            Int         @id @default(autoincrement())
-  name          String
-  condominium_id Int        // Relacionamento com o condomínio
-  condominium   Condominium @relation(fields: [condominium_id], references: [id])
-  lots          Lot[]       // Uma rua pode ter vários lotes
+  id           Int       @id @default(autoincrement())
+  name         String
+  condominium  Condominium? @relation(fields: [condominiumId], references: [id])
+  condominiumId Int?
+  lots         Lot[]     
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
+
 
 model Lot {
   id            Int        @id @default(autoincrement())

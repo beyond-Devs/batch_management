@@ -7,4 +7,9 @@ const lotSchema = z.object({
   description: z.string().optional(),
 });
 
+// const lotSchema = z.object({
+//   name: z.string().min(1, "O nome da rua é obrigatório."),
+//   streetId: z.number().min(1, "O ID do condomínio é obrigatório."),
+// });
+
 module.exports = lotSchema;
