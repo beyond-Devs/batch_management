@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import nofound from '@/assets/midea/app/no-found.png';
+import streetImage from '@/assets/midea/app/no-found.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
@@ -91,7 +91,7 @@ const CondominiumsList = () => {
 
     return (
         <div className="w-11/12 mx-auto my-5 relative h-auto">
-            {!isNoFound && (<h1 className="text-xl font-semibold text-justify dark:text-white mb-2">Lista de condomínios</h1>)}
+            {!isNoFound && (<h1 className="text-xl font-semibold text-justify dark:text-white mb-2">Condomínios</h1>)}
             {!isNoFound && (
                 <div className="mb-4 flex gap-4">
                     <Input
@@ -113,8 +113,9 @@ const CondominiumsList = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                    [...Array(6)].map((_, index) => (
+                    [...Array(3)].map((_, index) => (
                         <Card key={index} className="p-4 shadow-lg rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                            <Skeleton className="h-48 w-full mb-4 text-gray-400 dark:text-dark-secondary" />
                             <Skeleton className="h-6 w-full mb-4 text-gray-400 dark:text-dark-secondary" />
                             <Skeleton className="h-6 w-full mb-2 text-gray-400 dark:text-dark-secondary" />
                             <Skeleton className="h-6 w-full text-gray-400 dark:text-dark-secondary" />
@@ -125,8 +126,15 @@ const CondominiumsList = () => {
                         {filteredCondominiums.map((condominium) => (
                             <Card key={condominium.id} className="relative shadow-lg p-0 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 hover:shadow-2xl transition-all">
                                 <CardHeader>
-                                    <CardTitle className="text-lg font-semibold dark:text-white">{condominium.name}</CardTitle>
-                                    <CardDescription className="text-sm dark:text-gray-400">{condominium.location}</CardDescription>
+                                    <div className="flex flex-col w-auto h-auto justify-center items-center">
+                                       <Image 
+                                            src={streetImage}
+                                            alt="Nenhuma imagem encontrada"
+                                            className="w-[200px] h-auto"
+                                        /> 
+                                    </div>
+                                    <CardTitle className="text-base text-center font-semibold dark:text-white">{condominium.name}</CardTitle>
+                                    <CardDescription className="text-sm text-center dark:text-gray-400">{condominium.location}</CardDescription>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className="absolute top-2 right-2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -149,8 +157,8 @@ const CondominiumsList = () => {
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </CardHeader>
-                                <CardContent>
-                                    <p className="dark:text-gray-200">
+                                <CardContent className="text-center">
+                                    <p className="dark:text-gray-200 ">
                                         {condominium.streets && Array.isArray(condominium.streets)
                                             ? `${condominium.streets.reduce((totalLotes, street) => totalLotes + (street.lots?.length || 0), 0)} lote(s) / Terreno (s)`
                                             : 'Sem lotes cadastrados'}
@@ -164,7 +172,7 @@ const CondominiumsList = () => {
 
             {isNoFound && (
                 <div className="flex flex-col items-center justify-center text-center dark:text-gray-400 w-full">
-                    <Image src={nofound} alt="Imagem não encontrada" width={300} className="h-auto" />
+                    <Image src={streetImage} alt="Imagem não encontrada" width={300} className="h-auto" />
                     <h3 className="font-semibold text-xl">Nenhum condomínio encontrado!</h3>
                 </div>
             )}
