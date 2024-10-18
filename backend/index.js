@@ -19,7 +19,7 @@ const SECRET_KEY = 'aSW8zWJTlrvsN6jbDo23rSU34eDxvcdHni7S2k6M2+Y=';
 
 app.use(cors({
   origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], 
   credentials: true, 
 }));
 
@@ -77,6 +77,48 @@ app.get('/users/:id', async (req, res) => {
 
   if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
   res.json(user);
+});
+
+// Endpoint para exibir os dados do dashboard
+app.get('/dashboard', async (req, res) => {
+  try {
+    // Obtém os totais de condomínios, lotes e proprietários
+    const totalCondominiums = await prisma.condominium.count();
+    const totalLots = await prisma.lot.count();
+    const totalOwners = await prisma.owner.count();
+
+    // Busca o status dos lotes
+    const lotStatus = await prisma.lot.groupBy({
+      by: ['status'],
+      _count: {
+        status: true,
+      },
+    });
+
+    // Busca ocupações recentes (limite de 5 ocupações mais recentes)
+    const recentOccupations = await prisma.occupancy.findMany({
+      include: {
+        owner: true,
+        lot: true,
+      },
+      orderBy: {
+        occupancy_date: 'desc',
+      },
+      take: 5, // Limita a 5 resultados
+    });
+
+    // Envia a resposta com os dados agregados
+    res.status(200).json({
+      totalCondominiums,
+      totalLots,
+      totalOwners,
+      lotStatus,
+      recentOccupations,
+    });
+  } catch (error) {
+    console.error('Erro ao buscar dados do dashboard:', error);
+    res.status(500).json({ error: "Erro ao buscar dados do dashboard" });
+  }
 });
 
 // Endpoint para criar um condomínio
@@ -216,6 +258,24 @@ app.post('/lots', async (req, res) => {
 
     // Tratamento de outros erros
     res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// Rota para atualizar o status do lote
+app.patch("/lots/:id", async (req, res) => {
+  const { id } = req.params; // Pegando o ID do lote da URL
+  const { status } = req.body; // Pegando o novo status enviado no corpo da requisição
+
+  try {
+    // Atualizando o status do lote no banco de dados
+    const updatedLot = await prisma.lot.update({
+      where: { lot_number: Number(id) },
+      status: { status }, // Atualizando o campo "status"
+    });
+
+    res.status(200).json(updatedLot);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao atualizar o lote" });
   }
 });
 

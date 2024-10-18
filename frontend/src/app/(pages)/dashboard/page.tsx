@@ -132,16 +132,6 @@ const Page = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Input placeholder="Pesquisar ocupações..." className="flex-1 dark:border-gray-600" />
-                  <Select value={ownerFilter} onValueChange={setOwnerFilter}>
-                    <SelectTrigger className="w-[180px] dark:border-gray-600">
-                      <SelectValue placeholder="Filtrar por tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Todos">Todos</SelectItem>
-                      <SelectItem value="Residente">Residente</SelectItem>
-                      <SelectItem value="Investidor">Investidor</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 <ScrollArea className="h-[240px]">
                   <div className="space-y-4">
