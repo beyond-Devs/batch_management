@@ -123,11 +123,17 @@ const CondominiumsList = () => {
                                         </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
+                                        {condominium.streets && Array.isArray(condominium.streets)
+                                        ? 
+                                        <div></div>
+                                        : 
                                         <Link href={`/condominium/manage?id=${condominium.id}`} >
                                             <DropdownMenuItem>
-                                                <FileBarChart2 className="mr-2 w-4 h-4" />Gerir condomínio
+                                                <FileBarChart2 className="mr-2 w-4 h-4" />Montar esquema
                                             </DropdownMenuItem>
                                         </Link>
+                                        }
+                                        
                                         <DropdownMenuItem onClick={() => handleEdit(condominium)}>
                                             <Edit2 className="mr-2 w-4 h-4" /> Editar
                                         </DropdownMenuItem>
