@@ -28,6 +28,8 @@ export default function DesignerLayoutCondominio() {
   const [loteAtual, setLoteAtual] = useState<Lote | null>(null)
   const [nomeLote, setNomeLote] = useState('')
   const layoutRef = useRef<HTMLDivElement>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null)
 
   const axios = createAxiosInstance()
 
@@ -94,12 +96,6 @@ export default function DesignerLayoutCondominio() {
     }))
   }
 
-  const abrirModalLote = (lote: Lote) => {
-    setLoteAtual(lote)
-    setNomeLote(lote.nome)
-    setModalAberto(true)
-  }
-
   const salvarLote = () => {
     if (loteAtual) {
       setRuas(ruas.map(rua => ({
@@ -112,40 +108,42 @@ export default function DesignerLayoutCondominio() {
     setModalAberto(false)
   }
 
+  const abrirModalLote = (lote: Lote) => {
+    setLoteAtual(lote)
+    setNomeLote(lote.nome)
+    setModalAberto(true)
+  }
+
   const salvarLayout = async () => {
+    setIsLoading(true)
     try {
-      // Salva as ruas
       const ruaPromises = ruas.map(async (rua) => {
         const response = await axios.post('/streets', {
           name: rua.nome,
-          condominiumId: 1, // Ajuste o ID do condomínio conforme necessário
-        });
-        const ruaCriada = response.data;
-  
-        // Agora salva os lotes para cada rua criada
+          condominiumId: 1,
+        })
+        const ruaCriada = response.data
+
         const lotePromises = rua.lotes.map(async (lote, index) => {
           await axios.post('/lots', {
-            lot_number: index + 1, // Número do lote, baseado na ordem
-            street_id: ruaCriada.id, // Associa o lote com a rua criada
-            status: 'Available', // Status padrão, você pode ajustar conforme necessário
-            description: `Descrição do lote ${lote.nome}`, // Descrição opcional
-          });
-        });
-  
-        // Espera a criação dos lotes
-        await Promise.all(lotePromises);
-      });
-  
-      // Espera a criação das ruas e lotes
-      await Promise.all(ruaPromises);
-  
-      alert('Layout salvo com sucesso!');
+            lot_number: index + 1,
+            street_id: ruaCriada.id,
+            status: 'Available',
+            description: lote.nome,
+          })
+        })
+        await Promise.all(lotePromises)
+      })
+      await Promise.all(ruaPromises)
+
+      setStatusDialog('success')
     } catch (erro) {
-      alert('Erro ao salvar o layout');
-      console.error(erro);
+      setStatusDialog('error')
+    } finally {
+      setIsLoading(false)
     }
   };
-  
+
 
   return (
     <div className="bg-trasparent min-h-screen p-0 md:p-8">
@@ -178,19 +176,20 @@ export default function DesignerLayoutCondominio() {
               </CardContent>
             </Card>
             <div className="w-full md:w-3/4">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4 text-gray-700">Layout</h2>
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-700">Esquema</h2>
                 </div>
+                <div></div>
                 <div>
-                  <Button onClick={salvarLayout} className="w-full py-3">
-                    Salvar Layout
+                  <Button onClick={salvarLayout} disabled={isLoading} className="w-full py-3">
+                    {isLoading ? 'Carregando...' : 'Salvar esquema'}
                   </Button>
                 </div>
                 
               </div>
               
-              <div ref={layoutRef} className="space-y-4">
+              <div ref={layoutRef} className="space-y-4 border-2 border-dashed border-gray-300 p-6 min-h-[600px] rounded-xl bg-gray-50">
                 {ruas.map(rua => (
                   <Card
                     key={rua.id}
@@ -244,16 +243,297 @@ export default function DesignerLayoutCondominio() {
       </Card>
 
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogContent>
+        <DialogContent className='bg-white'>
           <DialogHeader>
             <DialogTitle>Editar Lote</DialogTitle>
           </DialogHeader>
-          <Input value={nomeLote} onChange={(e) => setNomeLote(e.target.value)} className="mb-4" />
+          <Input value={nomeLote} onChange={(e) => setNomeLote(e.target.value)} />
           <DialogFooter>
             <Button onClick={salvarLote}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={statusDialog !== null} onOpenChange={() => setStatusDialog(null)}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>{statusDialog === 'success' ? 'Sucesso' : 'Erro'}</DialogTitle>
+          </DialogHeader>
+          <p>
+            {statusDialog === 'success'
+              ? 'O esquema foi salvo com sucesso!'
+              : 'Ocorreu um erro ao salvar esquema.'}
+          </p>
+          <DialogFooter>
+            <Button onClick={() => setStatusDialog(null)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   )
 }
+
+
+// 'use client'
+
+// import React, { useState, useRef, useEffect } from 'react'
+// import Sortable from 'sortablejs'
+// import { PlusIcon, TrashIcon, HomeIcon } from 'lucide-react'
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+// import createAxiosInstance from '@/helpers/global/services/axios/axios.instance'
+
+// type Lote = {
+//   id: string
+//   nome: string
+// }
+
+// type Rua = {
+//   id: string
+//   nome: string
+//   lotes: Lote[]
+// }
+
+// export default function DesignerLayoutCondominio() {
+//   const [ruas, setRuas] = useState<Rua[]>([])
+//   const [ruaSelecionadaId, setRuaSelecionadaId] = useState<string | null>(null)
+//   const [quantidadeLotes, setQuantidadeLotes] = useState(1)
+//   const [modalAberto, setModalAberto] = useState(false)
+//   const [loteAtual, setLoteAtual] = useState<Lote | null>(null)
+//   const [nomeLote, setNomeLote] = useState('')
+//   const [isLoading, setIsLoading] = useState(false)
+//   const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null)
+//   const layoutRef = useRef<HTMLDivElement>(null)
+
+//   const axios = createAxiosInstance()
+
+//   useEffect(() => {
+//     if (layoutRef.current) {
+//       new Sortable(layoutRef.current, {
+//         animation: 150,
+//         ghostClass: 'bg-yellow-100',
+//         handle: '.rua-handle',
+//       })
+//     }
+//   }, [])
+
+//   useEffect(() => {
+//     ruas.forEach((rua) => {
+//       const el = document.getElementById(`rua-${rua.id}`)
+//       if (el) {
+//         new Sortable(el, {
+//           animation: 150,
+//           ghostClass: 'bg-yellow-100',
+//           group: 'lotes',
+//           handle: '.lote-handle',
+//         })
+//       }
+//     })
+//   }, [ruas])
+
+//   const adicionarRua = () => {
+//     const novaRua: Rua = {
+//       id: Date.now().toString(),
+//       nome: `Rua ${ruas.length + 1}`,
+//       lotes: []
+//     }
+//     setRuas([...ruas, novaRua])
+//     setRuaSelecionadaId(novaRua.id)
+//   }
+
+//   const excluirRua = (ruaId: string) => {
+//     setRuas(ruas.filter(rua => rua.id !== ruaId))
+//     if (ruaSelecionadaId === ruaId) {
+//       setRuaSelecionadaId(null)
+//     }
+//   }
+
+//   const adicionarLotes = (ruaId: string) => {
+//     setRuas(ruas.map(rua => {
+//       if (rua.id === ruaId) {
+//         const novosLotes = Array.from({ length: quantidadeLotes }, (_, i) => ({
+//           id: `${rua.id}-${rua.lotes.length + i + 1}`,
+//           nome: `Lote Vivenda ${rua.lotes.length + i + 1}`
+//         }))
+//         return { ...rua, lotes: [...rua.lotes, ...novosLotes] }
+//       }
+//       return rua
+//     }))
+//   }
+
+//   const excluirLote = (ruaId: string, loteId: string) => {
+//     setRuas(ruas.map(rua => {
+//       if (rua.id === ruaId) {
+//         return { ...rua, lotes: rua.lotes.filter(lote => lote.id !== loteId) }
+//       }
+//       return rua
+//     }))
+//   }
+
+//   const abrirModalLote = (lote: Lote) => {
+//     setLoteAtual(lote)
+//     setNomeLote(lote.nome)
+//     setModalAberto(true)
+//   }
+
+//   const salvarLote = () => {
+//     if (loteAtual) {
+//       setRuas(ruas.map(rua => ({
+//         ...rua,
+//         lotes: rua.lotes.map(lote => 
+//           lote.id === loteAtual.id ? { ...lote, nome: nomeLote } : lote
+//         )
+//       })))
+//     }
+//     setModalAberto(false)
+//   }
+
+//   const salvarLayout = async () => {
+//     setIsLoading(true)
+//     try {
+//       const ruaPromises = ruas.map(async (rua) => {
+//         const response = await axios.post('/streets', {
+//           name: rua.nome,
+//           condominiumId: 1,
+//         })
+//         const ruaCriada = response.data
+
+//         const lotePromises = rua.lotes.map(async (lote, index) => {
+//           await axios.post('/lots', {
+//             lot_number: index + 1,
+//             street_id: ruaCriada.id,
+//             status: 'Available',
+//             description: lote.nome,
+//           })
+//         })
+//         await Promise.all(lotePromises)
+//       })
+//       await Promise.all(ruaPromises)
+
+//       setStatusDialog('success')
+//     } catch (erro) {
+//       setStatusDialog('error')
+//     } finally {
+//       setIsLoading(false)
+//     }
+//   }
+
+//   return (
+//     <div className="bg-trasparent min-h-screen p-0 md:p-8">
+//       <Card className="max-w-6xl mx-auto">
+//         <CardHeader>
+//           <CardTitle className="text-3xl md:text-4xl font-bold text-center text-gray-800"></CardTitle>
+//         </CardHeader>
+//         <CardContent>
+//           <div className="flex flex-col md:flex-row md:space-x-8 mb-8">
+//             <Card className="w-full md:w-1/4 mb-4 md:mb-0">
+//               <CardHeader>
+//                 <CardTitle className="text-xl font-semibold text-gray-700">Ferramentas</CardTitle>
+//               </CardHeader>
+//               <CardContent className="space-y-4">
+//                 <Button onClick={adicionarRua} className="w-full">
+//                   <PlusIcon className="mr-2 h-4 w-4" /> Adicionar Rua
+//                 </Button>
+//                 <div className="items-center space-x-0">
+//                   <Input
+//                     type="number"
+//                     min="1"
+//                     value={quantidadeLotes}
+//                     onChange={(e) => setQuantidadeLotes(parseInt(e.target.value) || 1)}
+//                     className="w-full rounded-b-none"
+//                   />
+//                   <Button onClick={() => ruaSelecionadaId && adicionarLotes(ruaSelecionadaId)} className="w-full pt-3 rounded-t-none">
+//                     <PlusIcon className="mr-2 h-4 w-4" /> Adicionar Lotes
+//                   </Button>
+//                 </div>
+//               </CardContent>
+//             </Card>
+//             <div className="w-full md:w-3/4">
+//               <div className="grid grid-cols-3 gap-2">
+//                 <div>
+//                   <h2 className="text-2xl font-semibold mb-4 text-gray-700">Demonstração</h2>
+//                 </div>
+//                 <div></div>
+//                 <div>
+//                   <Button onClick={salvarLayout} disabled={isLoading} className="w-full py-3">
+//                     {isLoading ? 'Carregando...' : 'Salvar'}
+//                   </Button>
+//                 </div>
+//               </div>
+              
+//               <div ref={layoutRef} className="space-y-4 border-2 border-dashed border-gray-300 p-6 min-h-[600px] rounded-xl bg-gray-50">
+//                 {ruas.map(rua => (
+//                   <Card
+//                     key={rua.id}
+//                     className={`${ruaSelecionadaId === rua.id ? 'ring-2 ring-blue-500' : ''}`}
+//                     onClick={() => setRuaSelecionadaId(rua.id)}
+//                   >
+//                     <CardHeader className="flex flex-row items-center justify-between rua-handle cursor-move">
+//                       <Input
+//                         value={rua.nome}
+//                         onChange={(e) => setRuas(ruas.map(r => r.id === rua.id ? { ...r, nome: e.target.value } : r))}
+//                         className="text-xl font-semibold bg-transparent border-b-2 border-gray-300 focus:border-blue-500 outline-none"
+//                       />
+//                       <div className="flex space-x-2">
+//                         <Button variant="outline" size="sm" onClick={() => adicionarLotes(rua.id)}>
+//                           <PlusIcon className="h-4 w-4 mr-2" /> Lotes
+//                         </Button>
+//                         <Button variant="destructive" size="sm" onClick={() => excluirRua(rua.id)}>
+//                           <TrashIcon className="h-4 w-4" />
+//                         </Button>
+//                       </div>
+//                     </CardHeader>
+//                     <CardContent>
+//                       <div id={`rua-${rua.id}`} className="flex flex-wrap gap-3">
+//                         {rua.lotes.map(lote => (
+//                           <Button
+//                             key={lote.id}
+//                             className="lote-handle bg-white shadow border h-auto w-auto px-2 py-1 cursor-move"
+//                             onClick={() => abrirModalLote(lote)}
+//                           >
+//                             <HomeIcon className="mr-2 h-4 w-4" />
+//                             {lote.nome}
+//                           </Button>
+//                         ))}
+//                       </div>
+//                     </CardContent>
+//                   </Card>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </CardContent>
+//       </Card>
+
+//       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+//         <DialogContent>
+//           <DialogHeader>
+//             <DialogTitle>Editar Lote</DialogTitle>
+//           </DialogHeader>
+//           <Input value={nomeLote} onChange={(e) => setNomeLote(e.target.value)} />
+//           <DialogFooter>
+//             <Button onClick={salvarLote}>Salvar</Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+
+//       <Dialog open={statusDialog !== null} onOpenChange={() => setStatusDialog(null)}>
+//         <DialogContent>
+//           <DialogHeader>
+//             <DialogTitle>{statusDialog === 'success' ? 'Sucesso' : 'Erro'}</DialogTitle>
+//           </DialogHeader>
+//           <p>
+//             {statusDialog === 'success'
+//               ? 'O layout foi salvo com sucesso!'
+//               : 'Ocorreu um erro ao salvar o layout.'}
+//           </p>
+//           <DialogFooter>
+//             <Button onClick={() => setStatusDialog(null)}>Fechar</Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+//     </div>
+//   )
+// }
