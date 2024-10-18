@@ -97,10 +97,26 @@ app.post('/condominiums', async (req, res) => {
 
 // Endpoint para listar todos os condomínios
 app.get('/condominiums', async (req, res) => {
-  const condominiums = await prisma.condominium.findMany({
-    include: { streets: true } // Incluir ruas associadas ao condomínio
-  });
-  res.json(condominiums);
+  try {
+      const condominiums = await prisma.condominium.findMany({
+          include: {
+              streets: {
+                  include: {
+                      lots: true
+                  }
+              }
+          }
+      });
+
+      const condominiumsWithLotCount = condominiums.map(condo => ({
+          ...condo,
+          totalLots: condo.streets.reduce((acc, street) => acc + (street.lots?.length || 0), 0)
+      }));
+
+      res.json(condominiumsWithLotCount);
+  } catch (error) {
+      res.status(500).json({ error: "Error fetching condominiums" });
+  }
 });
 
 // Endpoint para listar um condomínio por ID
@@ -175,26 +191,6 @@ app.get('/streets/condominium/:condominiumId', async (req, res) => {
 });
 
 // Endpoint para criar um lote
-// app.post('/lots', async (req, res) => {
-//   try {
-//     const parsedData = lotSchema.parse(req.body);
-
-//     const lot = await prisma.lot.create({
-//       data: {
-//         name: parsedData.name,
-//         street_id: parsedData.streetId, // associação do lote com a rua
-//       },
-//     });
-
-//     res.json(lot);
-//   } catch (error) {
-//     if (error instanceof z.ZodError) {
-//       return res.status(400).json(error.errors);
-//     }
-//     res.status(500).json({ message: "Erro interno do servidor" });
-//   }
-// });
-
 app.post('/lots', async (req, res) => {
   try {
     // Validação dos dados de entrada usando Zod

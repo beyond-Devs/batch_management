@@ -99,7 +99,7 @@ const CondominiumsList = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                    [...Array(5)].map((_, index) => (
+                    [...Array(6)].map((_, index) => (
                         <Card key={index} className="p-4 shadow-lg rounded-lg dark:bg-gray-800 dark:border-gray-700">
                             <Skeleton className="h-6 w-full mb-4 text-gray-400 dark:text-dark-secondary" />
                             <Skeleton className="h-6 w-full mb-2 text-gray-400 dark:text-dark-secondary" />
@@ -140,7 +140,7 @@ const CondominiumsList = () => {
                             <CardContent>
                                 <p className="dark:text-gray-200">
                                     {condominium.streets && Array.isArray(condominium.streets)
-                                        ? `${condominium.streets.reduce((totalLotes, street) => totalLotes + (street.lots?.length || 0), 0)} lote(s)`
+                                        ? `${condominium.streets.reduce((totalLotes, street) => totalLotes + (street.lots?.length || 0), 0)} lote(s) / Terreno (s)`
                                         : 'Sem lotes cadastrados'}
                                 </p>
                             </CardContent>
