@@ -21,7 +21,7 @@ const NavProfile: React.FC<NavProfileProps> = ({ session }) => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 rounded-full flex items-center space-x-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-blue-800 text-white">{initials}</AvatarFallback>
+                      <AvatarFallback className="bg-blue-800 text-sm text-white">{initials}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{userName}</span>
                   </Button>

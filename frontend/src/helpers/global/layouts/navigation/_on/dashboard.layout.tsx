@@ -15,7 +15,7 @@ import NavProfile from "../components/nav-profile.component";
 import { useSession } from "next-auth/react";
 import { usePathname } from 'next/navigation'; 
 import Image from "next/image";
-import logo from "@/assets/midea/app/pedromag.png"
+import logo from "@/assets/midea/app/pedromag-transparent.png"
 
 const Dashboard = ({ children }) => {
   const { setTheme, theme } = useTheme();
@@ -33,7 +33,7 @@ const Dashboard = ({ children }) => {
       {/* Sidebar */}
       {sidebarOpen && (
         <aside className="w-64 bg-white dark:bg-gray-800">
-          <div className="px-4 py-4 pl-3 flex justify-start items-center">
+          <div className="px-4 py-3 pl-3 flex justify-start items-center">
           <Image
               alt="User avatar"
               className="w-10 h-10 object-cover"
@@ -43,18 +43,18 @@ const Dashboard = ({ children }) => {
                 objectFit: "cover",
               }}
             />
-            <h2 className="text-2xl font-bold text-blue-800 dark:text-white ">Pedromag</h2>
+            <h2 className="text-xl font-bold text-blue-800 dark:text-white px-2">Pedromag</h2>
           </div>
-          <div className="px-4 py-2 font-semibold dark:text-white">
+          {/* <div className="px-4 py-1 font-semibold dark:text-white text-gray-700">
             <h3>Menu</h3>
-          </div>
+          </div> */}
           <ScrollArea className="h-[calc(100vh-180px)]">
-            <nav className="mt-2 px-4">
+            <nav className="mt-4 px-4">
               {menuItems.map((item) => (
                 <Link key={item.name} href={item.path}>
                   <Button
                     variant={pathname === item.path ? "secondary" : "ghost"} 
-                    className={`w-full justify-start mb-1 ${pathname === item.path ? "bg-indigo-50 dark:bg-indigo-900" : ""} hover:bg-indigo-50 dark:hover:bg-indigo-900`}
+                    className={`w-full justify-start mb-1 ${pathname === item.path ? "bg-indigo-50 dark:bg-indigo-900" : ""} hover:bg-transparent`}
                   >
                     <item.icon className="mr-2 h-4 w-4 text-blue-800 dark:text-indigo-400" />
                     <span className="text-gray-700 dark:text-gray-200">{item.name}</span>
@@ -88,8 +88,19 @@ const Dashboard = ({ children }) => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar */}
         <header className="bg-white dark:bg-gray-800">
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between p-3">
             <div className="flex items-center">
+              {!sidebarOpen && (
+                <Image
+                  alt="User avatar"
+                  className="w-10 h-10 object-cover"
+                  src={logo}
+                  style={{
+                    aspectRatio: "128/128",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
               <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="mr-4">
                 <Menu className="h-5 w-5 text-gray-700 dark:text-gray-200" />
               </Button>

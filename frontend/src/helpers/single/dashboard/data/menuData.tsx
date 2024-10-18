@@ -6,7 +6,7 @@ const menuItems = [
   // { name: "Ruas", icon: Map, path: "/street" },     
   // { name: "Lotes", icon: Layers, path: "/lotes" }, 
   { name: "Clientes / Proprietários", icon: Users, path: "/owner" },
-  { name: "Ocupações", icon: Key, path: "/ocupacoes" },
+  { name: "Ocupações", icon: Key, path: "/occupancy" },
   { name: "Relatórios", icon: FileText, path: "/relatorios" },
 ];
 
