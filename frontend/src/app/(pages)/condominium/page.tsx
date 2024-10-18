@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import createAxiosInstance from "@/helpers/global/services/axios/axios.instance";
 import { Edit2, Trash2, MoreHorizontal, Plus, FileBarChart2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,6 +11,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Input } from "@/components/ui/input";
 import nofound from '@/assets/midea/app/no-found.png';
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 const CondominiumsList = () => {
     const [condominiums, setCondominiums] = useState([]);
@@ -22,6 +23,7 @@ const CondominiumsList = () => {
     const [searchName, setSearchName] = useState('');
     const [searchLocation, setSearchLocation] = useState('');
     const [isNoFound, setIsNoFound] = useState(false);
+    const router = useRouter();
 
     const axios = createAxiosInstance();
 
@@ -49,7 +51,6 @@ const CondominiumsList = () => {
     }, [searchName, searchLocation, condominiums]);
 
     useEffect(() => {
-        // Atualiza isNoFound baseado na quantidade de condomínios filtrados
         setIsNoFound(filteredCondominiums.length === 0 && !loading);
     }, [filteredCondominiums, loading]);
 
@@ -83,26 +84,31 @@ const CondominiumsList = () => {
         }
     };
 
+    const handleCreateLot = (id) => {
+        localStorage.setItem('condominiumId', id);
+        router.push('/condominium/manage'); 
+    };
+
     return (
         <div className="w-11/12 mx-auto my-5 relative h-auto">
             {!isNoFound && (<h1 className="text-xl font-semibold text-justify dark:text-white mb-2">Lista de condomínios</h1>)}
             {!isNoFound && (
-            <div className="mb-4 flex gap-4">
-                <Input
-                    type="text"
-                    placeholder="Filtrar por Nome"
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    className="w-full dark:border-neutral-600 dark:text-white"
-                />
-                <Input
-                    type="text"
-                    placeholder="Filtrar por Localização"
-                    value={searchLocation}
-                    onChange={(e) => setSearchLocation(e.target.value)}
-                    className="w-full dark:border-neutral-600 dark:text-white"
-                />
-            </div>
+                <div className="mb-4 flex gap-4">
+                    <Input
+                        type="text"
+                        placeholder="Filtrar por Nome"
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        className="w-full dark:border-neutral-600 dark:text-white"
+                    />
+                    <Input
+                        type="text"
+                        placeholder="Filtrar por Localização"
+                        value={searchLocation}
+                        onChange={(e) => setSearchLocation(e.target.value)}
+                        className="w-full dark:border-neutral-600 dark:text-white"
+                    />
+                </div>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,11 +134,12 @@ const CondominiumsList = () => {
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <Link href={`/condominium/manage?id=${condominium.id}`}>
-                                                <DropdownMenuItem>
+                                            {condominium.streets && Array.isArray(condominium.streets) && condominium.streets.length === 0 && (
+                                                <DropdownMenuItem onClick={() => handleCreateLot(condominium.id)}>
                                                     <FileBarChart2 className="mr-2 w-4 h-4" />
+                                                    Criar loteamento
                                                 </DropdownMenuItem>
-                                            </Link>
+                                            )}
                                             <DropdownMenuItem onClick={() => handleEdit(condominium)}>
                                                 <Edit2 className="mr-2 w-4 h-4" /> Editar
                                             </DropdownMenuItem>

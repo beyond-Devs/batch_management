@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Sortable from 'sortablejs'
 import { PlusIcon, TrashIcon, HomeIcon } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import createAxiosInstance from '@/helpers/global/services/axios/axios.instance'
+import { useRouter } from 'next/navigation';
 
 type Lote = {
   id: string
@@ -30,6 +31,9 @@ export default function DesignerLayoutCondominio() {
   const layoutRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null)
+  const router = useRouter();
+
+  const condominiumId = localStorage.getItem('condominiumId'); 
 
   const axios = createAxiosInstance()
 
@@ -42,6 +46,11 @@ export default function DesignerLayoutCondominio() {
       })
     }
   }, [])
+
+  const closeModalRedirect = () => {
+    localStorage.removeItem('condominiumId');
+    router.push("/condominium");
+  }
 
   useEffect(() => {
     ruas.forEach((rua) => {
@@ -79,7 +88,7 @@ export default function DesignerLayoutCondominio() {
       if (rua.id === ruaId) {
         const novosLotes = Array.from({ length: quantidadeLotes }, (_, i) => ({
           id: `${rua.id}-${rua.lotes.length + i + 1}`,
-          nome: `Lote ${rua.lotes.length + i + 1}`
+          nome: `Lote vivenda ${rua.lotes.length + i + 1}`
         }))
         return { ...rua, lotes: [...rua.lotes, ...novosLotes] }
       }
@@ -115,12 +124,13 @@ export default function DesignerLayoutCondominio() {
   }
 
   const salvarLayout = async () => {
+    if (!condominiumId) return // Evita executar se `id` não estiver disponível
     setIsLoading(true)
     try {
       const ruaPromises = ruas.map(async (rua) => {
         const response = await axios.post('/streets', {
           name: rua.nome,
-          condominiumId: 1,
+          condominiumId: Number(condominiumId),
         })
         const ruaCriada = response.data
 
@@ -142,8 +152,7 @@ export default function DesignerLayoutCondominio() {
     } finally {
       setIsLoading(false)
     }
-  };
-
+  }
 
   return (
     <div className="bg-trasparent min-h-screen p-0 md:p-8">
@@ -178,15 +187,14 @@ export default function DesignerLayoutCondominio() {
             <div className="w-full md:w-3/4">
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4 text-gray-700">Esquema</h2>
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-700">Loteamento</h2>
                 </div>
                 <div></div>
                 <div>
                   <Button onClick={salvarLayout} disabled={isLoading} className="w-full py-3">
-                    {isLoading ? 'Carregando...' : 'Salvar esquema'}
+                    {isLoading ? 'Carregando...' : 'Salvar loteamento'}
                   </Button>
                 </div>
-                
               </div>
               
               <div ref={layoutRef} className="space-y-4 border-2 border-dashed border-gray-300 p-6 min-h-[600px] rounded-xl bg-gray-50">
@@ -261,11 +269,13 @@ export default function DesignerLayoutCondominio() {
           </DialogHeader>
           <p>
             {statusDialog === 'success'
-              ? 'O esquema foi salvo com sucesso!'
-              : 'Ocorreu um erro ao salvar esquema.'}
+              ? 'Loteamento salvo com sucesso!'
+              : 'Ocorreu um erro ao salvar loteamento.'}
           </p>
           <DialogFooter>
-            <Button onClick={() => setStatusDialog(null)}>Fechar</Button>
+            {statusDialog === 'success' 
+              ? ( <Button onClick={() => closeModalRedirect()}>Fechar</Button> ) 
+              : ( <Button onClick={() => setStatusDialog(null)}>Fechar</Button> ) }
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -276,7 +286,7 @@ export default function DesignerLayoutCondominio() {
 
 // 'use client'
 
-// import React, { useState, useRef, useEffect } from 'react'
+// import { useState, useRef, useEffect } from 'react'
 // import Sortable from 'sortablejs'
 // import { PlusIcon, TrashIcon, HomeIcon } from 'lucide-react'
 // import { Button } from "@/components/ui/button"
@@ -284,6 +294,7 @@ export default function DesignerLayoutCondominio() {
 // import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 // import createAxiosInstance from '@/helpers/global/services/axios/axios.instance'
+// import { useRouter } from 'next/router'
 
 // type Lote = {
 //   id: string
@@ -303,9 +314,11 @@ export default function DesignerLayoutCondominio() {
 //   const [modalAberto, setModalAberto] = useState(false)
 //   const [loteAtual, setLoteAtual] = useState<Lote | null>(null)
 //   const [nomeLote, setNomeLote] = useState('')
+//   const layoutRef = useRef<HTMLDivElement>(null)
 //   const [isLoading, setIsLoading] = useState(false)
 //   const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null)
-//   const layoutRef = useRef<HTMLDivElement>(null)
+//   const router = useRouter();
+//   const { id } = router.query;
 
 //   const axios = createAxiosInstance()
 
@@ -355,7 +368,7 @@ export default function DesignerLayoutCondominio() {
 //       if (rua.id === ruaId) {
 //         const novosLotes = Array.from({ length: quantidadeLotes }, (_, i) => ({
 //           id: `${rua.id}-${rua.lotes.length + i + 1}`,
-//           nome: `Lote Vivenda ${rua.lotes.length + i + 1}`
+//           nome: `Lote ${rua.lotes.length + i + 1}`
 //         }))
 //         return { ...rua, lotes: [...rua.lotes, ...novosLotes] }
 //       }
@@ -372,12 +385,6 @@ export default function DesignerLayoutCondominio() {
 //     }))
 //   }
 
-//   const abrirModalLote = (lote: Lote) => {
-//     setLoteAtual(lote)
-//     setNomeLote(lote.nome)
-//     setModalAberto(true)
-//   }
-
 //   const salvarLote = () => {
 //     if (loteAtual) {
 //       setRuas(ruas.map(rua => ({
@@ -390,13 +397,19 @@ export default function DesignerLayoutCondominio() {
 //     setModalAberto(false)
 //   }
 
+//   const abrirModalLote = (lote: Lote) => {
+//     setLoteAtual(lote)
+//     setNomeLote(lote.nome)
+//     setModalAberto(true)
+//   }
+
 //   const salvarLayout = async () => {
 //     setIsLoading(true)
 //     try {
 //       const ruaPromises = ruas.map(async (rua) => {
 //         const response = await axios.post('/streets', {
 //           name: rua.nome,
-//           condominiumId: 1,
+//           condominiumId: id,
 //         })
 //         const ruaCriada = response.data
 
@@ -418,7 +431,8 @@ export default function DesignerLayoutCondominio() {
 //     } finally {
 //       setIsLoading(false)
 //     }
-//   }
+//   };
+
 
 //   return (
 //     <div className="bg-trasparent min-h-screen p-0 md:p-8">
@@ -453,14 +467,15 @@ export default function DesignerLayoutCondominio() {
 //             <div className="w-full md:w-3/4">
 //               <div className="grid grid-cols-3 gap-2">
 //                 <div>
-//                   <h2 className="text-2xl font-semibold mb-4 text-gray-700">Demonstração</h2>
+//                   <h2 className="text-2xl font-semibold mb-4 text-gray-700">Esquema</h2>
 //                 </div>
 //                 <div></div>
 //                 <div>
 //                   <Button onClick={salvarLayout} disabled={isLoading} className="w-full py-3">
-//                     {isLoading ? 'Carregando...' : 'Salvar'}
+//                     {isLoading ? 'Carregando...' : 'Salvar esquema'}
 //                   </Button>
 //                 </div>
+                
 //               </div>
               
 //               <div ref={layoutRef} className="space-y-4 border-2 border-dashed border-gray-300 p-6 min-h-[600px] rounded-xl bg-gray-50">
@@ -488,14 +503,23 @@ export default function DesignerLayoutCondominio() {
 //                     <CardContent>
 //                       <div id={`rua-${rua.id}`} className="flex flex-wrap gap-3">
 //                         {rua.lotes.map(lote => (
-//                           <Button
-//                             key={lote.id}
-//                             className="lote-handle bg-white shadow border h-auto w-auto px-2 py-1 cursor-move"
-//                             onClick={() => abrirModalLote(lote)}
-//                           >
-//                             <HomeIcon className="mr-2 h-4 w-4" />
-//                             {lote.nome}
-//                           </Button>
+//                           <div key={lote.id} className="group relative">
+//                             <Button
+//                               variant="outline"
+//                               size="sm"
+//                               onClick={() => abrirModalLote(lote)}
+//                               className="flex items-center space-x-2 lote-handle cursor-move"
+//                             >
+//                               <HomeIcon className="h-4 w-4" />
+//                               <span>{lote.nome}</span>
+//                             </Button>
+//                             <button
+//                               onClick={() => excluirLote(rua.id, lote.id)}
+//                               className="absolute top-0 right-0 hidden group-hover:block text-red-500"
+//                             >
+//                               <TrashIcon className="h-4 w-4" />
+//                             </button>
+//                           </div>
 //                         ))}
 //                       </div>
 //                     </CardContent>
@@ -508,7 +532,7 @@ export default function DesignerLayoutCondominio() {
 //       </Card>
 
 //       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-//         <DialogContent>
+//         <DialogContent className='bg-white'>
 //           <DialogHeader>
 //             <DialogTitle>Editar Lote</DialogTitle>
 //           </DialogHeader>
@@ -520,14 +544,14 @@ export default function DesignerLayoutCondominio() {
 //       </Dialog>
 
 //       <Dialog open={statusDialog !== null} onOpenChange={() => setStatusDialog(null)}>
-//         <DialogContent>
+//         <DialogContent className="bg-white">
 //           <DialogHeader>
 //             <DialogTitle>{statusDialog === 'success' ? 'Sucesso' : 'Erro'}</DialogTitle>
 //           </DialogHeader>
 //           <p>
 //             {statusDialog === 'success'
-//               ? 'O layout foi salvo com sucesso!'
-//               : 'Ocorreu um erro ao salvar o layout.'}
+//               ? 'O esquema foi salvo com sucesso!'
+//               : 'Ocorreu um erro ao salvar esquema.'}
 //           </p>
 //           <DialogFooter>
 //             <Button onClick={() => setStatusDialog(null)}>Fechar</Button>
