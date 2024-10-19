@@ -80,7 +80,7 @@ const Page = () => {
         {totalOwners > 0 ? (
           <Card className="bg-gradient-to-br from-purple-400 to-purple-600 text-white border-none">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-medium">Total de Proprietários</CardTitle>
+              <CardTitle className="text-lg font-medium">Total de clientes</CardTitle>
               <Users className="h-5 w-5" />
             </CardHeader>
             <CardContent>

@@ -369,19 +369,18 @@ app.post('/occupancies', async (req, res) => {
 
 app.get('/occupancies', async (req, res) => {
   try {
-    // Buscando ocupações com as relações necessárias
     const occupancies = await prisma.occupancy.findMany({
       include: {
         lot: {
           include: {
             street: {
               include: {
-                condominium: true, // Inclui o condomínio
+                condominium: true, 
               },
             },
           },
         },
-        owner: true, // Inclui informações do proprietário
+        owner: true, 
       },
     });
 

@@ -5,9 +5,9 @@ const menuItems = [
   { name: "Condomínios", icon: Building, path: "/condominium" },
   // { name: "Ruas", icon: Map, path: "/street" },     
   // { name: "Lotes", icon: Layers, path: "/lotes" }, 
-  { name: "Clientes / Proprietários", icon: Users, path: "/owner" },
+  { name: "Clientes", icon: Users, path: "/owner" },
   { name: "Ocupações", icon: Key, path: "/occupancy" },
-  { name: "Relatórios", icon: FileText, path: "/relatorios" },
+  // { name: "Relatórios", icon: FileText, path: "/relatorios" },
 ];
 
 export default menuItems;

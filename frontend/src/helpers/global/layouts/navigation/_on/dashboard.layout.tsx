@@ -51,7 +51,7 @@ const Dashboard = ({ children }) => {
           <ScrollArea className="h-[calc(100vh-180px)]">
             <nav className="mt-4 px-4">
               {menuItems.map((item) => (
-                <Link key={item.name} href={item.path}>
+                <Link key={item.name} href={item.path} passHref>
                   <Button
                     variant={pathname === item.path ? "secondary" : "ghost"} 
                     className={`w-full justify-start mb-1 ${pathname === item.path ? "bg-indigo-50 dark:bg-indigo-900" : ""} hover:bg-transparent`}

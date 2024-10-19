@@ -134,7 +134,7 @@ const CondominiumsList = () => {
                                         /> 
                                     </div>
                                     <CardTitle className="text-base text-center font-semibold dark:text-white">{condominium.name}</CardTitle>
-                                    <CardDescription className="text-sm text-center dark:text-gray-400">{condominium.location}</CardDescription>
+                                    <CardDescription className="text-base text-center dark:text-gray-400">{condominium.location}</CardDescription>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className="absolute top-2 right-2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -157,7 +157,7 @@ const CondominiumsList = () => {
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </CardHeader>
-                                <CardContent className="text-center">
+                                <CardContent className="text-center text-sm">
                                     <p className="dark:text-gray-200 ">
                                         {condominium.streets && Array.isArray(condominium.streets)
                                             ? `${condominium.streets.reduce((totalLotes, street) => totalLotes + (street.lots?.length || 0), 0)} lote(s) / Terreno (s)`
