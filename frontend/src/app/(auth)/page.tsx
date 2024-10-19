@@ -217,7 +217,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useLogin } from "@/helpers/single/sign-in/hooks/login";
 import { Rocket, Clock, Star, FileText } from "lucide-react"
-import avatar from "@/assets/midea/app/avatar-2.png"
+import condomain from "@/assets/midea/app/condomain.webp"
 import logo from "@/assets/midea/app/pedromag.png"
 import { Toaster } from "@/components/ui/toaster";
 
@@ -228,14 +228,19 @@ const Page = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
       {/* Esquerda com ícones e imagem */}
-      <div className="flex-1 flex items-center justify-center p-8 righ-waves" >
-        <div className="relative w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center p-0 righ-waves" 
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${condomain.src})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',}}>
+        <div className="relative w-full max-w-full">
           {/* Bolhas de fundo animadas */}
-          <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          {/* <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
           <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div> */}
 
-          <div className="m-4 relative space-y-4">
+          <div className="m-0 relative space-y-0">
             {/* Ícones de destaque */}
             {/* <div className="flex items-center justify-center space-x-2">
               <Rocket className="w-8 h-8 text-purple-500" />
@@ -244,18 +249,18 @@ const Page = () => {
               <FileText className="w-10 h-10 text-green-400" />
             </div> */}
 
-            {/* Avatar de usuário */}
-            <div className="p-5 bg-transparent rounded-lg items-center justify-center">
+            {/* condomain de usuário */}
+            <div className="p-0 bg-transparent rounded-lg items-center justify-center">
               <div className="w-full h-full flex-shrink-0 block items-center justify-center">
-                <img
-                  alt="User avatar"
+                {/* <img
+                  alt="User condomain"
                   className="w-full h-full object-cover"
-                  src={avatar.src}
+                  src={condomain.src}
                   style={{
                     aspectRatio: "128/128",
                     objectFit: "cover",
                   }}
-                />
+                /> */}
               </div>
             </div>
           </div>
@@ -268,7 +273,7 @@ const Page = () => {
           {/* Boas-vindas e descrição */}
           <div className="">
             <img
-              alt="User avatar"
+              alt="User condomain"
               className="w-16 h-16 object-cover"
               src={logo.src}
               style={{
