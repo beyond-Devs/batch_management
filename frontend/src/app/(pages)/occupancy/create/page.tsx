@@ -6,7 +6,6 @@ import createAxiosInstance from "@/helpers/global/services/axios/axios.instance"
 const AddOccupancy = () => {
   const [lotId, setLotId] = useState("");
   const [ownerId, setOwnerId] = useState("");
-  const [occupancyDate, setOccupancyDate] = useState("");
   const [lots, setLots] = useState([]);
   const [owners, setOwners] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,9 +43,8 @@ const AddOccupancy = () => {
       // Resetar os estados do formulário
       setLotId("");
       setOwnerId("");
-      setOccupancyDate("");
     } catch (error) {
-      alert("Erro ao registrar a ocupação ou atualizar o estado do lote");
+      alert("Erro ao registrar a ocupação ou atualizar o estado do lote " + error.reponse);
       console.log(error);
     } finally {
       setLoading(false);

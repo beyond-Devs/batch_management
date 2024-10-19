@@ -261,21 +261,22 @@ app.post('/lots', async (req, res) => {
   }
 });
 
-// Rota para atualizar o status do lote
-app.patch("/lots/:id", async (req, res) => {
-  const { id } = req.params; // Pegando o ID do lote da URL
-  const { status } = req.body; // Pegando o novo status enviado no corpo da requisição
+// Rota para atualizar apenas o status de um lote
+app.patch('/lots/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // O status recebido deve ser um valor do enum LotStatus
 
   try {
-    // Atualizando o status do lote no banco de dados
     const updatedLot = await prisma.lot.update({
-      where: { lot_number: Number(id) },
-      status: { status }, // Atualizando o campo "status"
+      where: { id: Number(id) },
+      data: { 
+        status: status,  // Aqui você passa o valor do enum, por exemplo 'Occupied'
+      },
     });
 
-    res.status(200).json(updatedLot);
+    res.json(updatedLot);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao atualizar o lote" });
+    res.status(500).json({ error: 'Erro ao atualizar o status do lote' });
   }
 });
 
@@ -332,32 +333,70 @@ app.get('/owners/:id', async (req, res) => {
   res.json(owner);
 });
 
-// Endpoint para criar uma ocupação
+// Rota para registrar uma nova ocupação
 app.post('/occupancies', async (req, res) => {
+  const { lot_id, owner_id } = req.body; 
+
   try {
-    const parsedData = occupancySchema.parse(req.body);
-    const occupancy = await prisma.occupancy.create({
-      data: parsedData,
+    const newOccupancy = await prisma.occupancy.create({
+      data: {
+        lot_id: Number(lot_id),     
+        owner_id: Number(owner_id),  
+        occupancy_date: new Date(),  
+      },
     });
-    res.json(occupancy);
+
+    res.status(201).json(newOccupancy);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json(error.errors);
-    }
-    res.status(500).json({ message: "Erro interno do servidor" });
+    res.status(500).json({ error: 'Erro ao registrar a ocupação' });
   }
 });
 
+
 // Endpoint para listar todas as ocupações
+// app.get('/occupancies', async (req, res) => {
+//   const occupancies = await prisma.occupancy.findMany({
+//     include: {
+//       lot: true,
+//       owner: true,
+//       user: true,
+//       street: true,
+//       condominium: true
+//     }
+//   });
+//   res.json(occupancies);
+// });
+
 app.get('/occupancies', async (req, res) => {
-  const occupancies = await prisma.occupancy.findMany({
-    include: {
-      lot: true,
-      owner: true,
-      user: true,
-    }
-  });
-  res.json(occupancies);
+  try {
+    // Buscando ocupações com as relações necessárias
+    const occupancies = await prisma.occupancy.findMany({
+      include: {
+        lot: {
+          include: {
+            street: {
+              include: {
+                condominium: true, // Inclui o condomínio
+              },
+            },
+          },
+        },
+        owner: true, // Inclui informações do proprietário
+      },
+    });
+
+    // Ordenando ocupações por data
+    const sortedOccupancies = occupancies.sort((a, b) => {
+      const dateA = new Date(a.occupancy_date).getTime();
+      const dateB = new Date(b.occupancy_date).getTime();
+      return dateB - dateA; 
+    });
+
+    res.status(200).json(sortedOccupancies);
+  } catch (error) {
+    console.error("Erro ao buscar ocupações:", error);
+    res.status(500).json({ error: 'Erro ao buscar ocupações' });
+  }
 });
 
 // Endpoint para listar uma ocupação por ID
