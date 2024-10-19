@@ -55,8 +55,6 @@ const CondominiumDetails = () => {
     try {
       const response = await axios.get('/condominiums');
       setCondominiums(response.data || []);
-
-      console.log(response.data);
     } catch (error) {
       console.error('Erro ao buscar condomínios:', error);
     }
@@ -73,14 +71,27 @@ const CondominiumDetails = () => {
 
   const selectOwner = async (lotId: string, ownerId: string) => {
     try {
-      // Primeiro, atualizar o status do lote para 'Occupied'
       await axios.patch(`/lots/${lotId}`, { status: 'Occupied' });
 
-      // Em seguida, criar a ocupação
-      const response = await axios.post<Occupancy>('/occupancies', {
+      await axios.post<Occupancy>('/occupancies', {
         lot_id: lotId,
         owner_id: ownerId
       });
+
+      setCondominiums(prevCondominiums => prevCondominiums.map(condominium => {
+        if (condominium.id === selectedCondominiumId) {
+          return {
+            ...condominium,
+            streets: condominium.streets.map(street => ({
+              ...street,
+              lots: street.lots.map(lot => 
+                lot.id === lotId ? { ...lot, status: 'Occupied' } : lot
+              )
+            }))
+          };
+        }
+        return condominium;
+      }));
 
       setNotificationMessage('Ocupação salva com sucesso!');
       setNotificationType('success');
@@ -92,13 +103,11 @@ const CondominiumDetails = () => {
     }
   };
 
-  // Filtra ruas que têm lotes e remove duplicados
   const filterUniqueStreetsWithLots = (streets: Street[]) => {
     const seen: { [key: string]: boolean } = {};
     return streets.filter(street => {
-      // Apenas ruas com lotes são consideradas
       if (street.lots.length === 0 || seen[street.name]) {
-        return false; // Ignora ruas sem lotes ou duplicadas
+        return false;
       }
       seen[street.name] = true;
       return true;
@@ -106,24 +115,33 @@ const CondominiumDetails = () => {
   };
 
   const renderLotes = (lots: Lot[]) => {
-    return Array.isArray(lots) ? lots.map((lot, index) => (
-      <div key={`${lot.id}-${index}`} className="p-2 border border-gray-300 rounded shadow">
-        <span>{lot.description} - {lot.status}</span>
-        <button
+    if (!Array.isArray(lots)) return null;
+
+    return lots.map((lot, index) => {
+      const isOccupied = lot.status === 'Occupied';
+      const lotStatusText = isOccupied ? 'Ocupado' : 'Disponível'; 
+
+      return (
+        <div
+          key={`${lot.id}-${index}`}
+          className={`p-2 border text-center border-gray-300 rounded shadow cursor-pointer ${isOccupied ? 'bg-green-400' : 'hover:bg-gray-200'}`}
           onClick={() => {
-            setSelectedLot(lot);
-            setOpenModal(true);
+            if (!isOccupied) {
+              setSelectedLot(lot);
+              setOpenModal(true);
+            }
           }}
-          className="ml-2 text-blue-500 underline"
         >
-          Selecionar
-        </button>
-      </div>
-    )) : null;
+          <span className={`text-sm text-center ${isOccupied ? 'font-bold text-green-500' : ''}`}>
+            {lot.description} {lotStatusText} 
+          </span>
+        </div>
+      );
+    });
   };
 
   return (
-    <div className="bg-transprent min-h-screen flex flex-col items-center justify-start p-0 sm:p-4">
+    <div className="bg-transparent min-h-screen flex flex-col items-center justify-start p-0 sm:p-4">
       <Select onValueChange={(value) => setSelectedCondominiumId(value)}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione um condomínio" />
@@ -152,7 +170,7 @@ const CondominiumDetails = () => {
                   {street.name}
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-7 gap-1 sm:gap-2">
-                  {renderLotes(street.lots)}
+                  {renderLotes(street.lots)} 
                 </div>
               </div>
             ))}
