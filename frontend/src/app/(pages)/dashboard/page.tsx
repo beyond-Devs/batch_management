@@ -31,7 +31,6 @@ const Page = () => {
     );
   }
 
-  // Mapeamento de status do lot para tradução
   const statusMap = {
     Available: "Disponível",
     Occupied: "Ocupado",
@@ -39,7 +38,6 @@ const Page = () => {
     Delivered: "Entregue",
   };
 
-  // Alternar cores no gráfico
   const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"];
 
   const { totalCondominiums, totalLots, totalOwners, lotStatus, recentOccupations, oldOccupations } = data;
@@ -55,7 +53,7 @@ const Page = () => {
   return (
     <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {totalCondominiums > 0 && (
+        {totalCondominiums > 0 ? (
           <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white border-none">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg font-medium">Total de Condomínios</CardTitle>
@@ -65,8 +63,18 @@ const Page = () => {
               <div className="text-3xl font-bold">{totalCondominiums}</div>
             </CardContent>
           </Card>
+        ) : (
+          <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white border-none">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Total de Condomínios</CardTitle>
+              <Building className="h-5 w-5" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">----</div>
+            </CardContent>
+          </Card>
         )}
-        {totalLots > 0 && (
+        {totalLots > 0 ? (
           <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white border-none">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg font-medium">Total de Terrenos</CardTitle>
@@ -74,6 +82,16 @@ const Page = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{totalLots}</div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white border-none">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Total de Terrenos</CardTitle>
+              <Map className="h-5 w-5" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">----</div>
             </CardContent>
           </Card>
         )}
@@ -110,7 +128,7 @@ const Page = () => {
                 <SelectContent>
                   {lotStatus?.length > 0 && lotStatus.map((item) => (
                     <SelectItem key={item.status} value={item.status}>
-                      {statusMap[item.status]} {/* Tradução do status */}
+                      {statusMap[item.status]} 
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -121,7 +139,7 @@ const Page = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={filteredLotStatusData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="status" tickFormatter={(status) => statusMap[status]} /> {/* Exibir tradução no eixo X */}
+                    <XAxis dataKey="status" tickFormatter={(status) => statusMap[status]} /> 
                     <YAxis />
                     <Tooltip />
                     <Legend />
@@ -163,7 +181,7 @@ const Page = () => {
                           <p className="text-sm text-gray-500 dark:text-gray-400">Lote: {occupation.lot.lot_number}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{occupation.occupancy_date}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(occupation.occupancy_date).toLocaleDateString()}</p>
                           <p className="text-xs text-gray-400 dark:text-gray-500">{occupation.owner.type}</p>
                         </div>
                       </motion.div>

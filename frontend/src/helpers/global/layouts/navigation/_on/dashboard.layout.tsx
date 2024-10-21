@@ -54,7 +54,7 @@ const Dashboard = ({ children }) => {
                 <Link key={item.name} href={item.path} passHref>
                   <Button
                     variant={pathname === item.path ? "secondary" : "ghost"} 
-                    className={`w-full justify-start mb-1 ${pathname === item.path ? "bg-indigo-50 dark:bg-indigo-900" : ""} hover:bg-transparent`}
+                    className={`w-full justify-start mb-1 ${pathname === item.path ? "bg-indigo-50 dark:bg-indigo-900" : ""}`}
                   >
                     <item.icon className="mr-2 h-4 w-4 text-blue-800 dark:text-indigo-400" />
                     <span className="text-gray-700 dark:text-gray-200">{item.name}</span>

@@ -1,19 +1,13 @@
-"use client";
+'use client'
 
+import { z } from 'zod';
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import createAxiosInstance from "@/helpers/global/services/axios/axios.instance";
-import { 
-    Dialog, 
-    DialogTrigger, 
-    DialogContent, 
-    DialogHeader, 
-    DialogTitle, 
-    DialogDescription, 
-    DialogClose 
-} from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import { condominiumSchema } from '@/helpers/single/condominium/schemas/condominium.schema';
 
 const AddCondominium = () => {
     const [name, setName] = useState('');
@@ -22,21 +16,50 @@ const AddCondominium = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
     const [isError, setIsError] = useState(false);
+    const [nameError, setNameError] = useState('');
+    const [locationError, setLocationError] = useState('');
     const axios = createAxiosInstance();
+
+    const validateName = (value: string) => {
+        try {
+            condominiumSchema.pick({ name: true }).parse({ name: value });
+            setNameError('');
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                setNameError(error.errors[0].message);
+            }
+        }
+    };
+
+    const validateLocation = (value: string) => {
+        try {
+            condominiumSchema.pick({ location: true }).parse({ location: value });
+            setLocationError('');
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                setLocationError(error.errors[0].message);
+            }
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
+            condominiumSchema.parse({ name, location });
+
             await axios.post('/condominiums', { name, location });
             setDialogMessage('Condomínio adicionado com sucesso!');
             setIsError(false);
 
-            // Reset input fields
             setName('');
             setLocation('');
         } catch (error) {
-            setDialogMessage(error.response?.data?.message || 'Ocorreu um erro. Tente novamente.');
+            if (error instanceof z.ZodError) {
+                setDialogMessage(error.errors.map(err => err.message).join(', '));
+            } else {
+                setDialogMessage(error.response?.data?.message || 'Ocorreu um erro. Tente novamente.');
+            }
             setIsError(true);
         } finally {
             setOpenDialog(true);
@@ -54,10 +77,13 @@ const AddCondominium = () => {
                         id="name" 
                         type="text" 
                         value={name} 
-                        onChange={(e) => setName(e.target.value)} 
-                        required 
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            validateName(e.target.value);
+                        }} 
                         className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                     />
+                    {nameError && <p className="text-red-500">{nameError}</p>}
                 </div>
                 <div>
                     <Label htmlFor="location" className="dark:text-white">Localização (Opcional)</Label>
@@ -65,9 +91,13 @@ const AddCondominium = () => {
                         id="location" 
                         type="text" 
                         value={location} 
-                        onChange={(e) => setLocation(e.target.value)} 
+                        onChange={(e) => {
+                            setLocation(e.target.value);
+                            validateLocation(e.target.value);
+                        }} 
                         className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                     />
+                    {locationError && <p className="text-red-500">{locationError}</p>}
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                     {loading ? 'Aguarde...' : 'Adicionar Condomínio'}

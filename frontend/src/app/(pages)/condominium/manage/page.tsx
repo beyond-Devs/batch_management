@@ -1,41 +1,44 @@
-'use client'
+'use client';
 
-import { useState, useRef, useEffect } from 'react'
-import Sortable from 'sortablejs'
-import { PlusIcon, TrashIcon, HomeIcon } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import createAxiosInstance from '@/helpers/global/services/axios/axios.instance'
+import { useState, useRef, useEffect } from 'react';
+import Sortable from 'sortablejs';
+import { PlusIcon, TrashIcon, HomeIcon } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import createAxiosInstance from '@/helpers/global/services/axios/axios.instance';
 import { useRouter } from 'next/navigation';
 
 type Lote = {
-  id: string
-  nome: string
-}
+  id: string;
+  nome: string;
+};
 
 type Rua = {
-  id: string
-  nome: string
-  lotes: Lote[]
-}
+  id: string;
+  nome: string;
+  lotes: Lote[];
+};
 
 export default function DesignerLayoutCondominio() {
-  const [ruas, setRuas] = useState<Rua[]>([])
-  const [ruaSelecionadaId, setRuaSelecionadaId] = useState<string | null>(null)
-  const [quantidadeLotes, setQuantidadeLotes] = useState(1)
-  const [modalAberto, setModalAberto] = useState(false)
-  const [loteAtual, setLoteAtual] = useState<Lote | null>(null)
-  const [nomeLote, setNomeLote] = useState('')
-  const layoutRef = useRef<HTMLDivElement>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null)
+  const [ruas, setRuas] = useState<Rua[]>([]);
+  const [ruaSelecionadaId, setRuaSelecionadaId] = useState<string | null>(null);
+  const [quantidadeLotes, setQuantidadeLotes] = useState(1);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [loteAtual, setLoteAtual] = useState<Lote | null>(null);
+  const [nomeLote, setNomeLote] = useState('');
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null);
   const router = useRouter();
 
-  const condominiumId = localStorage.getItem('condominiumId'); 
+  const condominiumId = localStorage.getItem('condominiumId');
 
-  const axios = createAxiosInstance()
+  const axios = createAxiosInstance();
+
+  // Estado para contar o total de lotes
+  const [totalLotes, setTotalLotes] = useState(0);
 
   useEffect(() => {
     if (layoutRef.current) {
@@ -43,67 +46,70 @@ export default function DesignerLayoutCondominio() {
         animation: 150,
         ghostClass: 'bg-yellow-100',
         handle: '.rua-handle',
-      })
+      });
     }
-  }, [])
+  }, []);
 
   const closeModalRedirect = () => {
     localStorage.removeItem('condominiumId');
     router.push("/condominium");
-  }
+  };
 
   useEffect(() => {
     ruas.forEach((rua) => {
-      const el = document.getElementById(`rua-${rua.id}`)
+      const el = document.getElementById(`rua-${rua.id}`);
       if (el) {
         new Sortable(el, {
           animation: 150,
           ghostClass: 'bg-yellow-100',
           group: 'lotes',
           handle: '.lote-handle',
-        })
+        });
       }
-    })
-  }, [ruas])
+    });
+    // Atualiza a contagem total de lotes
+    const total = ruas.reduce((acc, rua) => acc + rua.lotes.length, 0);
+    setTotalLotes(total);
+  }, [ruas]);
 
   const adicionarRua = () => {
     const novaRua: Rua = {
       id: Date.now().toString(),
       nome: `Rua ${ruas.length + 1}`,
       lotes: []
-    }
-    setRuas([...ruas, novaRua])
-    setRuaSelecionadaId(novaRua.id)
-  }
+    };
+    setRuas([...ruas, novaRua]);
+    setRuaSelecionadaId(novaRua.id);
+  };
 
   const excluirRua = (ruaId: string) => {
-    setRuas(ruas.filter(rua => rua.id !== ruaId))
+    setRuas(ruas.filter(rua => rua.id !== ruaId));
     if (ruaSelecionadaId === ruaId) {
-      setRuaSelecionadaId(null)
+      setRuaSelecionadaId(null);
     }
-  }
+  };
 
   const adicionarLotes = (ruaId: string) => {
     setRuas(ruas.map(rua => {
       if (rua.id === ruaId) {
         const novosLotes = Array.from({ length: quantidadeLotes }, (_, i) => ({
-          id: `${rua.id}-${rua.lotes.length + i + 1}`,
-          nome: `Lote vivenda ${rua.lotes.length + i + 1}`
-        }))
-        return { ...rua, lotes: [...rua.lotes, ...novosLotes] }
+          id: `${totalLotes + i + 1}`, // Use o total de lotes para o ID
+          nome: `Lote vivenda ${totalLotes + i + 1}` // Use o total de lotes para o nome
+        }));
+        return { ...rua, lotes: [...rua.lotes, ...novosLotes] };
       }
-      return rua
-    }))
-  }
+      return rua;
+    }));
+  };
 
   const excluirLote = (ruaId: string, loteId: string) => {
     setRuas(ruas.map(rua => {
       if (rua.id === ruaId) {
-        return { ...rua, lotes: rua.lotes.filter(lote => lote.id !== loteId) }
+        return { ...rua, lotes: rua.lotes.filter(lote => lote.id !== loteId) };
       }
-      return rua
-    }))
-  }
+      return rua;
+    }));
+  };
 
   const salvarLote = () => {
     if (loteAtual) {
@@ -112,27 +118,27 @@ export default function DesignerLayoutCondominio() {
         lotes: rua.lotes.map(lote => 
           lote.id === loteAtual.id ? { ...lote, nome: nomeLote } : lote
         )
-      })))
+      })));
     }
-    setModalAberto(false)
-  }
+    setModalAberto(false);
+  };
 
   const abrirModalLote = (lote: Lote) => {
-    setLoteAtual(lote)
-    setNomeLote(lote.nome)
-    setModalAberto(true)
-  }
+    setLoteAtual(lote);
+    setNomeLote(lote.nome);
+    setModalAberto(true);
+  };
 
   const salvarLayout = async () => {
-    if (!condominiumId) return // Evita executar se `id` não estiver disponível
-    setIsLoading(true)
+    if (!condominiumId) return; // Evita executar se `id` não estiver disponível
+    setIsLoading(true);
     try {
       const ruaPromises = ruas.map(async (rua) => {
         const response = await axios.post('/streets', {
           name: rua.nome,
           condominiumId: Number(condominiumId),
-        })
-        const ruaCriada = response.data
+        });
+        const ruaCriada = response.data;
 
         const lotePromises = rua.lotes.map(async (lote, index) => {
           await axios.post('/lots', {
@@ -140,19 +146,19 @@ export default function DesignerLayoutCondominio() {
             street_id: ruaCriada.id,
             status: 'Available',
             description: lote.nome,
-          })
-        })
-        await Promise.all(lotePromises)
-      })
-      await Promise.all(ruaPromises)
+          });
+        });
+        await Promise.all(lotePromises);
+      });
+      await Promise.all(ruaPromises);
 
-      setStatusDialog('success')
+      setStatusDialog('success');
     } catch (erro) {
-      setStatusDialog('error')
+      setStatusDialog('error');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-trasparent min-h-screen p-0 md:p-8">
@@ -273,16 +279,15 @@ export default function DesignerLayoutCondominio() {
               : 'Ocorreu um erro ao salvar loteamento.'}
           </p>
           <DialogFooter>
-            {statusDialog === 'success' 
-              ? ( <Button onClick={() => closeModalRedirect()}>Fechar</Button> ) 
-              : ( <Button onClick={() => setStatusDialog(null)}>Fechar</Button> ) }
+            <Button onClick={() => statusDialog === 'success' ? closeModalRedirect() : setStatusDialog(null)}>
+              Fechar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-
 
 // 'use client'
 
@@ -294,7 +299,7 @@ export default function DesignerLayoutCondominio() {
 // import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 // import createAxiosInstance from '@/helpers/global/services/axios/axios.instance'
-// import { useRouter } from 'next/router'
+// import { useRouter } from 'next/navigation';
 
 // type Lote = {
 //   id: string
@@ -318,7 +323,8 @@ export default function DesignerLayoutCondominio() {
 //   const [isLoading, setIsLoading] = useState(false)
 //   const [statusDialog, setStatusDialog] = useState<'success' | 'error' | null>(null)
 //   const router = useRouter();
-//   const { id } = router.query;
+
+//   const condominiumId = localStorage.getItem('condominiumId'); 
 
 //   const axios = createAxiosInstance()
 
@@ -331,6 +337,11 @@ export default function DesignerLayoutCondominio() {
 //       })
 //     }
 //   }, [])
+
+//   const closeModalRedirect = () => {
+//     localStorage.removeItem('condominiumId');
+//     router.push("/condominium");
+//   }
 
 //   useEffect(() => {
 //     ruas.forEach((rua) => {
@@ -368,7 +379,7 @@ export default function DesignerLayoutCondominio() {
 //       if (rua.id === ruaId) {
 //         const novosLotes = Array.from({ length: quantidadeLotes }, (_, i) => ({
 //           id: `${rua.id}-${rua.lotes.length + i + 1}`,
-//           nome: `Lote ${rua.lotes.length + i + 1}`
+//           nome: `Lote vivenda ${rua.lotes.length + i + 1}`
 //         }))
 //         return { ...rua, lotes: [...rua.lotes, ...novosLotes] }
 //       }
@@ -404,12 +415,13 @@ export default function DesignerLayoutCondominio() {
 //   }
 
 //   const salvarLayout = async () => {
+//     if (!condominiumId) return // Evita executar se `id` não estiver disponível
 //     setIsLoading(true)
 //     try {
 //       const ruaPromises = ruas.map(async (rua) => {
 //         const response = await axios.post('/streets', {
 //           name: rua.nome,
-//           condominiumId: id,
+//           condominiumId: Number(condominiumId),
 //         })
 //         const ruaCriada = response.data
 
@@ -431,8 +443,7 @@ export default function DesignerLayoutCondominio() {
 //     } finally {
 //       setIsLoading(false)
 //     }
-//   };
-
+//   }
 
 //   return (
 //     <div className="bg-trasparent min-h-screen p-0 md:p-8">
@@ -467,15 +478,14 @@ export default function DesignerLayoutCondominio() {
 //             <div className="w-full md:w-3/4">
 //               <div className="grid grid-cols-3 gap-2">
 //                 <div>
-//                   <h2 className="text-2xl font-semibold mb-4 text-gray-700">Esquema</h2>
+//                   <h2 className="text-2xl font-semibold mb-4 text-gray-700">Loteamento</h2>
 //                 </div>
 //                 <div></div>
 //                 <div>
 //                   <Button onClick={salvarLayout} disabled={isLoading} className="w-full py-3">
-//                     {isLoading ? 'Carregando...' : 'Salvar esquema'}
+//                     {isLoading ? 'Carregando...' : 'Salvar loteamento'}
 //                   </Button>
 //                 </div>
-                
 //               </div>
               
 //               <div ref={layoutRef} className="space-y-4 border-2 border-dashed border-gray-300 p-6 min-h-[600px] rounded-xl bg-gray-50">
@@ -550,11 +560,13 @@ export default function DesignerLayoutCondominio() {
 //           </DialogHeader>
 //           <p>
 //             {statusDialog === 'success'
-//               ? 'O esquema foi salvo com sucesso!'
-//               : 'Ocorreu um erro ao salvar esquema.'}
+//               ? 'Loteamento salvo com sucesso!'
+//               : 'Ocorreu um erro ao salvar loteamento.'}
 //           </p>
 //           <DialogFooter>
-//             <Button onClick={() => setStatusDialog(null)}>Fechar</Button>
+//             {statusDialog === 'success' 
+//               ? ( <Button onClick={() => closeModalRedirect()}>Fechar</Button> ) 
+//               : ( <Button onClick={() => setStatusDialog(null)}>Fechar</Button> ) }
 //           </DialogFooter>
 //         </DialogContent>
 //       </Dialog>
