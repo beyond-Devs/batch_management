@@ -1,13 +1,14 @@
 'use client'
 
-import { z } from 'zod';
 import { useState } from 'react';
+import { z } from 'zod';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import createAxiosInstance from "@/helpers/global/services/axios/axios.instance";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 import { condominiumSchema } from '@/helpers/single/condominium/schemas/condominium.schema';
+import { addCondominium } from '@/helpers/single/condominium/services/addCondominiumService';
+import { CondominiumData } from '@/helpers/single/condominium/interfaces/condominiumData.interface';
 
 const AddCondominium = () => {
     const [name, setName] = useState('');
@@ -18,7 +19,6 @@ const AddCondominium = () => {
     const [isError, setIsError] = useState(false);
     const [nameError, setNameError] = useState('');
     const [locationError, setLocationError] = useState('');
-    const axios = createAxiosInstance();
 
     const validateName = (value: string) => {
         try {
@@ -46,9 +46,10 @@ const AddCondominium = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            condominiumSchema.parse({ name, location });
+            const condominiumData: CondominiumData = { name, location };
+            condominiumSchema.parse({ condominiumData });
 
-            await axios.post('/condominiums', { name, location });
+            await addCondominium(condominiumData);
             setDialogMessage('Condomínio adicionado com sucesso!');
             setIsError(false);
 
